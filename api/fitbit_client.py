@@ -1,8 +1,7 @@
 import pandas as pd
-from datetime import date
 import fitbit
-import gather_keys_oauth2 as Oauth2
-from datetime import date,timedelta
+import api.gather_keys_oauth2 as Oauth2
+
 
 class FitbitApiClient:
     """
@@ -81,12 +80,3 @@ class FitbitApiClient:
         # Export file to csv
         final_df.to_csv('minuteSleep' + '.csv', index=False)
         final_stages_df.to_csv('minutesStagesSleep' + '.csv', index=True)
-
-
-CLIENT_ID = '23QRJ6'
-CLIENT_SECRET = 'abb49f0cdfcfd2605f02fcae11dda3b4'
-item = FitbitApiClient(CLIENT_ID,CLIENT_SECRET)
-startTime = date(year = 2023, month = 3, day = 27)
-endTime = date.today()
-allDates = pd.date_range(start=startTime, end = endTime)
-item.get_sleep_for_daterange(startTime,endTime)
