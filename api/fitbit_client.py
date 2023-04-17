@@ -1,6 +1,5 @@
 import pandas as pd
 from datetime import date
-from setup_connection import setup_fitbit_api_connection
 import fitbit
 import gather_keys_oauth2 as Oauth2
 from datetime import date,timedelta
