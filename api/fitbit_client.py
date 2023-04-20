@@ -1,7 +1,7 @@
 import pandas as pd
 import fitbit
 import gather_keys_oauth2 as Oauth2
-from datetime import date,timedelta
+from datetime import date,timedelta,datetime
 
 class FitbitApiClient:
     """
@@ -20,9 +20,9 @@ class FitbitApiClient:
             server.browser_authorize()
             ACCESS_TOKEN = str(server.fitbit.client.session.token['access_token'])
             REFRESH_TOKEN = str(server.fitbit.client.session.token['refresh_token'])
-            self.fibit_client = fitbit.Fitbit(client_id, client_secret, oauth2=True, access_token=ACCESS_TOKEN, refresh_token=REFRESH_TOKEN)
+            self.fitbit_client = fitbit.Fitbit(client_id, client_secret, oauth2=True, access_token=ACCESS_TOKEN, refresh_token=REFRESH_TOKEN)
         except Exception as e:
-            self.fibit_client = None
+            self.fitbit_client = None
             raise Exception(e)
 
 
@@ -37,12 +37,13 @@ class FitbitApiClient:
         for oneDate in allDates:
             oneDate = oneDate.date().strftime("%Y-%m-%d")
 
-            oneDayData = self.fibit_client.sleep(date=oneDate)
+            oneDayData = self.fitbit_client.sleep(date=oneDate)
+            print(oneDayData)
 
             # get number of minutes for each stage of sleep and such.
-            print(oneDayData['summary'])
             try:
                 stages_df = pd.DataFrame(oneDayData['summary'])
+                print(stages_df)
             except: continue
 
             df = pd.DataFrame(oneDayData['sleep'][0]['minuteData'])
@@ -81,12 +82,48 @@ class FitbitApiClient:
         final_df.to_csv('minuteSleep' + '.csv', index=False)
         final_stages_df.to_csv('minutesStagesSleep' + '.csv', index=True)
 
+    def get_all_hrv_data(self, startDate=None, endDate=None):
+        # Retrieve the user's join date
+        user_profile = self.fitbit_client.user_profile_get()
+        oldest_date = user_profile["user"]["memberSince"]
+        oldest_date = datetime.strptime(oldest_date, "%Y-%m-%d").date()
+
+        # Set the start date as the oldest available HRV data if start date is not specified
+        startDate = startDate or oldest_date
+
+        # Set the end date as yesterday's date if end date is not specified
+        endDate = endDate or datetime.now().date() - timedelta(days=1)
+
+        # Create an empty dictionary to store the HRV data by date
+        hrv_data_by_date = {}
+
+        # Loop through each day from the start date to end date
+        current_date = startDate
+        while current_date <= endDate:
+            # Retrieve HRV data for the current date
+            hrv_data = self.fitbit_client.intraday_time_series("activities/heart", base_date=current_date,
+                                                               detail_level="1min")
+            if "activities-heart-intraday" in hrv_data:
+                hrv_data_by_date[current_date] = hrv_data["activities-heart-intraday"]
+            # Move on to the next day
+            current_date += timedelta(days=1)
+
+        return hrv_data_by_date
+
 
 
 CLIENT_ID = '23QRJ6'
 CLIENT_SECRET = 'abb49f0cdfcfd2605f02fcae11dda3b4'
 item = FitbitApiClient(CLIENT_ID,CLIENT_SECRET)
-startTime = date(year = 2023, month = 3, day = 27)
-endTime = date.today()
-print(startTime)
-item.get_sleep_for_daterange(startTime, endTime)
+hrv_data_by_date = item.get_all_hrv_data()
+
+# CUSTOM RANGE
+# startTime = date(year = 2023, month = 4, day = 18)
+# endTime = date.today()
+# hrv_data_by_date = item.get_all_hrv_data(startTime,endTime)
+
+for date in hrv_data_by_date:
+    hrv_data = hrv_data_by_date[date]['dataset']
+    print(date)
+    print(hrv_data)
+
