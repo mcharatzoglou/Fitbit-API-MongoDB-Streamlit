@@ -28,7 +28,7 @@ filtered_df = df.loc[start_datetime:end_datetime]
 
 #create the plot
 fig, ax = plt.subplots()
-ax.plot(filtered_df.index, filtered_df['heart_rate'])
+ax.plot(filtered_df.index, filtered_df['heart_rate'],linewidth=0.4)
 ax.set_xlabel("Time")
 ax.set_ylabel("Heart Rate")
 ax.set_title("Heart Rate Over Time")
