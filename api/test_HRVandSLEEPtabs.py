@@ -48,7 +48,7 @@ if selected_tab == "Heart Rate":
 
 elif selected_tab == "Sleep":
     st.title('My Fitbit data')
-    st.markdown("###Sleep Data")
+    st.markdown("### Sleep Data")
     # Import and display visualization from python file for Sleep
 
 
