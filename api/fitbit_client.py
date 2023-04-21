@@ -155,5 +155,5 @@ item = FitbitApiClient(CLIENT_ID,CLIENT_SECRET)
 # hrv_data_by_date = item.get_all_hrv_data(startTime,endTime)
 startTime = date(year = 2023, month = 4, day = 18)
 endTime = date.today()
-heart_rate = item.get_heart_rate_data(startTime,endTime,"heartRate.csv")
+heart_rate = item.get_heart_rate_data(output_file="heartRate.csv")
 
