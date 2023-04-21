@@ -30,5 +30,6 @@ ax.set_xlabel("Time")
 ax.set_ylabel("Heart Rate")
 ax.set_title("Heart Rate Over Time")
 ax.xaxis.set_major_formatter(plt.FixedFormatter(filtered_df.index.strftime('%Y-%m-%d %H:%M')))
-ax.tick_params(axis='x', rotation=45) # Add this line to rotate the x-axis labels
+ax.tick_params(axis='x', rotation=45, labelsize=6) 
+ax.tick_params(axis='y', labelsize=6) 
 st.pyplot(fig)
