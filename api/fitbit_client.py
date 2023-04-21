@@ -87,11 +87,11 @@ class FitbitApiClient:
     def get_all_hrv_data(self, startDate=None, endDate=None):
         # Fitbit API endpoint
         url = "https://api.fitbit.com/1/user/{user_id}/hrv/date/{date}.json"
-        # url = "https://api.fitbit.com/1.2/user/{user_id}/sleep/date/{date}.json"
+        #url = "https://api.fitbit.com/1.2/user/{user_id}/sleep/date/{date}.json"
 
         # User and date information
         user_id = self.USER_ID
-        date = "2023-04-17"
+        date = "2023-04-21"
 
         # Authorization header
         access_token = self.ACCESS_TOKEN
@@ -109,17 +109,43 @@ class FitbitApiClient:
         else:
             print("Error:", response.status_code, response.text)
 
+    def get_heart_rate_data(self, startDate=None, endDate=None):
+        # Retrieve the user's join date
+        user_profile = self.fitbit_client.user_profile_get()
+        oldest_date = user_profile["user"]["memberSince"]
+        oldest_date = datetime.strptime(oldest_date, "%Y-%m-%d").date()
+
+        # Set the start date as the oldest available HRV data if start date is not specified
+        startDate = startDate or oldest_date
+
+        # Set the end date as yesterday's date if end date is not specified
+        endDate = endDate or datetime.now().date() - timedelta(days=1)
+
+        # Create an empty dictionary to store the HRV data by date
+        hrv_data_by_date = {}
+
+        # Loop through each day from the start date to end date
+        current_date = startDate
+        while current_date <= endDate:
+            # Retrieve HRV data for the current date
+            hrv_data = self.fitbit_client.intraday_time_series("activities/heart", base_date=current_date,
+                                                               detail_level="1min")
+            if "activities-heart-intraday" in hrv_data:
+                hrv_data_by_date[current_date] = hrv_data["activities-heart-intraday"]
+            # Move on to the next day
+            current_date += timedelta(days=1)
+
+        return hrv_data_by_date
+
 
 
 CLIENT_ID = '23QRJ6'
 CLIENT_SECRET = 'abb49f0cdfcfd2605f02fcae11dda3b4'
 item = FitbitApiClient(CLIENT_ID,CLIENT_SECRET)
-hrv_data_by_date = item.get_all_hrv_data()
-
-# CUSTOM RANGE
-# startTime = date(year = 2023, month = 4, day = 18)
-# endTime = date.today()
+# hrv_data_by_date = item.get_all_hrv_data()
 # hrv_data_by_date = item.get_all_hrv_data(startTime,endTime)
-
-print(hrv_data_by_date)
+startTime = date(year = 2023, month = 4, day = 18)
+endTime = date.today()
+heart_rate = item.get_heart_rate_data(startTime,endTime)
+print(heart_rate)
 
