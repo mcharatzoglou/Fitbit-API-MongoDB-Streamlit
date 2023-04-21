@@ -52,8 +52,8 @@ elif selected_tab == "Sleep":
     # Import and display visualization from python file for Sleep
 
 
-    df = pd.read_csv(
-        r"C:\Users\sophi\PycharmProjects\2nd-Lab-Project-Fitbit-API-MongoDB-Streamlit\api\minutesStagesSleep.csv")
+    #df = pd.read_csv(r"C:\Users\sophi\PycharmProjects\2nd-Lab-Project-Fitbit-API-MongoDB-Streamlit\api\minutesStagesSleep.csv")
+    df = pd.read_csv("minutesStagesSleep.csv")
 
     df['datetime'] = pd.to_datetime(df['date'], format='%Y-%m-%d')
 
