@@ -147,5 +147,9 @@ item = FitbitApiClient(CLIENT_ID,CLIENT_SECRET)
 startTime = date(year = 2023, month = 4, day = 18)
 endTime = date.today()
 heart_rate = item.get_heart_rate_data(startTime,endTime)
-print(heart_rate)
+
+for date in heart_rate:
+    hrv_data = heart_rate[date]['dataset']
+    print(date)
+    print(hrv_data)
 
