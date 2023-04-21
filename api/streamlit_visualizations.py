@@ -1,8 +1,8 @@
 import streamlit as st
 import numpy as np
 import pandas as pd
-import pymongo
 import matplotlib.pyplot as plt
+import matplotlib.dates as mdates
 
 
 df = pd.read_csv("heartRate.csv")
@@ -32,7 +32,9 @@ ax.plot(filtered_df.index, filtered_df['heart_rate'])
 ax.set_xlabel("Time")
 ax.set_ylabel("Heart Rate")
 ax.set_title("Heart Rate Over Time")
-ax.xaxis.set_major_formatter(plt.FixedFormatter(filtered_df.index.strftime('%Y-%m-%d %H:%M')))
+date_fmt = "%m/%d/%Y %H:%M"
+date_formatter = mdates.DateFormatter(date_fmt)
+ax.xaxis.set_major_formatter(date_formatter)
 ax.tick_params(axis='x', rotation=45, labelsize=6) 
 ax.tick_params(axis='y', labelsize=6) 
 
