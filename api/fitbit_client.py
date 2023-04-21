@@ -3,6 +3,7 @@ import fitbit
 import gather_keys_oauth2 as Oauth2
 from datetime import date,timedelta,datetime
 import requests
+import csv
 
 class FitbitApiClient:
     """
@@ -109,7 +110,7 @@ class FitbitApiClient:
         else:
             print("Error:", response.status_code, response.text)
 
-    def get_heart_rate_data(self, startDate=None, endDate=None):
+    def get_heart_rate_data(self, startDate=None, endDate=None, output_file=None):
         # Retrieve the user's join date
         user_profile = self.fitbit_client.user_profile_get()
         oldest_date = user_profile["user"]["memberSince"]
@@ -121,22 +122,30 @@ class FitbitApiClient:
         # Set the end date as yesterday's date if end date is not specified
         endDate = endDate or datetime.now().date() - timedelta(days=1)
 
-        # Create an empty dictionary to store the HRV data by date
-        hrv_data_by_date = {}
+        # Create an empty list to store the HRV data
+        hrv_data = []
 
         # Loop through each day from the start date to end date
         current_date = startDate
         while current_date <= endDate:
             # Retrieve HRV data for the current date
-            hrv_data = self.fitbit_client.intraday_time_series("activities/heart", base_date=current_date,
-                                                               detail_level="1min")
-            if "activities-heart-intraday" in hrv_data:
-                hrv_data_by_date[current_date] = hrv_data["activities-heart-intraday"]
+            hrv_data_for_day = self.fitbit_client.intraday_time_series("activities/heart", base_date=current_date,
+                                                                       detail_level="1min")
+            if "activities-heart-intraday" in hrv_data_for_day:
+                hrv_data_for_day = hrv_data_for_day["activities-heart-intraday"]["dataset"]
+                for data_point in hrv_data_for_day:
+                    hrv_data.append([current_date.strftime('%Y-%m-%d'), data_point["time"], data_point["value"]])
             # Move on to the next day
             current_date += timedelta(days=1)
 
-        return hrv_data_by_date
+        # Write the HRV data to a CSV file
+        if output_file:
+            with open(output_file, "w", newline='') as csv_file:
+                writer = csv.writer(csv_file)
+                writer.writerow(["date", "time", "heart_rate"])
+                writer.writerows(hrv_data)
 
+        return hrv_data
 
 
 CLIENT_ID = '23QRJ6'
@@ -146,10 +155,5 @@ item = FitbitApiClient(CLIENT_ID,CLIENT_SECRET)
 # hrv_data_by_date = item.get_all_hrv_data(startTime,endTime)
 startTime = date(year = 2023, month = 4, day = 18)
 endTime = date.today()
-heart_rate = item.get_heart_rate_data(startTime,endTime)
-
-for date in heart_rate:
-    hrv_data = heart_rate[date]['dataset']
-    print(date)
-    print(hrv_data)
+heart_rate = item.get_heart_rate_data(startTime,endTime,"heartRate.csv")
 
