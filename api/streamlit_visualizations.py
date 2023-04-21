@@ -26,11 +26,18 @@ end_datetime = pd.to_datetime(str(end_date) + ' ' + str(end_time))
 # Filter the dataframe based on the selected datetime range
 filtered_df = df.loc[start_datetime:end_datetime]
 
-
+# Create a Pyplot figure
 fig, ax = plt.subplots()
+
+# Plot the heart rate values
 ax.plot(filtered_df.index, filtered_df['heart_rate'])
 
-ax.set_xlabel("Datetime")
+
+ax.set_xlabel("Time")
+ax.set_ylabel("Heart Rate")
 ax.set_title("Heart Rate Over Time")
+ax.xaxis.set_major_formatter(plt.FixedFormatter(filtered_df.index.strftime('%Y-%m-%d %H:%M')))
+ax.tick_params(axis='x', rotation=45) # Add this line to rotate the x-axis labels
+
 fig.set_size_inches(10, 6)
 st.pyplot(fig)
