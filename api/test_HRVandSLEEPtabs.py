@@ -47,13 +47,10 @@ if selected_tab == "Heart Rate":
     st.pyplot(fig)
 
 elif selected_tab == "Sleep":
-    st.title("Sleep Visualization")
+    st.title('My Fitbit data')
+    st.markdown("###Sleep Data")
     # Import and display visualization from python file for Sleep
-    import streamlit as st
-    import numpy as np
-    import pandas as pd
-    # import pymongo
-    import matplotlib.pyplot as plt
+
 
     df = pd.read_csv(
         r"C:\Users\sophi\PycharmProjects\2nd-Lab-Project-Fitbit-API-MongoDB-Streamlit\api\minutesStagesSleep.csv")
