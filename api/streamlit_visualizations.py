@@ -38,7 +38,7 @@ else:
     ax.set_xlabel("Time")
     ax.set_ylabel("Heart Rate values")
     ax.set_title("Heart Rate Over Time")
-    date_fmt = "%m/%d/%Y %H:%M"
+    date_fmt = "%Y/%m/%d %H:%M"
     date_formatter = mdates.DateFormatter(date_fmt)
     ax.xaxis.set_major_formatter(date_formatter)
     ax.tick_params(axis='x', rotation=45, labelsize=6) 
