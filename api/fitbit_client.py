@@ -41,12 +41,10 @@ class FitbitApiClient:
             oneDate = oneDate.date().strftime("%Y-%m-%d")
 
             oneDayData = self.fitbit_client.sleep(date=oneDate)
-            print(oneDayData)
 
             # get number of minutes for each stage of sleep and such.
             try:
                 stages_df = pd.DataFrame(oneDayData['summary'])
-                print(stages_df)
             except: continue
 
             df = pd.DataFrame(oneDayData['sleep'][0]['minuteData'])
@@ -152,8 +150,10 @@ CLIENT_ID = '23QRJ6'
 CLIENT_SECRET = 'abb49f0cdfcfd2605f02fcae11dda3b4'
 item = FitbitApiClient(CLIENT_ID,CLIENT_SECRET)
 # hrv_data_by_date = item.get_all_hrv_data()
-# hrv_data_by_date = item.get_all_hrv_data(startTime,endTime)
+
 startTime = date(year = 2023, month = 4, day = 18)
 endTime = date.today()
-heart_rate = item.get_heart_rate_data(startTime,endTime,"heartRate.csv")
+hrv_data_by_date = item.get_all_hrv_data(startTime,endTime)
+# heart_rate = item.get_heart_rate_data(startTime,endTime,"heartRate.csv")
+# sleep_data = item.get_sleep_for_daterange(startTime=startTime,endTime=endTime)
 
