@@ -1,9 +1,10 @@
 import pandas as pd
 import fitbit
-import gather_keys_oauth2 as Oauth2
+import api.gather_keys_oauth2 as Oauth2
 from datetime import date,timedelta,datetime
 import requests
 import csv
+import json
 
 class FitbitApiClient:
     """
@@ -147,13 +148,50 @@ class FitbitApiClient:
 
         return hrv_data
 
+    def get_sleep_data_for_datarange(self,startDate=None,endDate=None):
+        # Retrieve the user's join date
+        user_profile = self.fitbit_client.user_profile_get()
+        oldest_date = user_profile["user"]["memberSince"]
+        oldest_date = datetime.strptime(oldest_date, "%Y-%m-%d").date()
+
+        # Set the start date as the oldest available HRV data if start date is not specified
+        startDate = startDate or oldest_date
+
+        # Set the end date as yesterday's date if end date is not specified
+        endDate = endDate or datetime.now().date() - timedelta(days=1)
+
+        # Fitbit API endpoint
+        url = "https://api.fitbit.com/1.2/user/{user_id}/sleep/date/{start_date}/{end_date}.json"
+
+        # User and date information
+        user_id = self.USER_ID
+
+        # Authorization header
+        access_token = self.ACCESS_TOKEN
+        headers = {"Authorization": "Bearer " + access_token}
+
+        # Make the API request
+        print(url.format(user_id=user_id, start_date=startDate, end_date=endDate))
+        response = requests.get(url.format(user_id=user_id, start_date=startDate, end_date=endDate), headers=headers)
+
+        # Check the response status code
+        if response.status_code == 200:
+            # Parse the sleep data from the JSON response
+            sleep_data = response.json()
+            return sleep_data
+        else:
+            print("Error:", response.status_code, response.text)
+
+        return
+
+
+
 
 CLIENT_ID = '23QRJ6'
 CLIENT_SECRET = 'abb49f0cdfcfd2605f02fcae11dda3b4'
-item = FitbitApiClient(CLIENT_ID,CLIENT_SECRET)
+# item = FitbitApiClient(CLIENT_ID,CLIENT_SECRET)
 # hrv_data_by_date = item.get_all_hrv_data()
 # hrv_data_by_date = item.get_all_hrv_data(startTime,endTime)
 startTime = date(year = 2023, month = 4, day = 18)
 endTime = date.today()
-heart_rate = item.get_heart_rate_data(output_file="heartRate.csv")
 
