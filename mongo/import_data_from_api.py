@@ -58,31 +58,24 @@ class FitbitMongoClient():
 
 
     def import_heart_data_for_daterange(self, startTime=None, endTime=None, detail_level="1min"):
-        heart_data = self.fitbit_api_client.get_heart_rate_data_for_datarange(startTime,endTime,detail_level)
-        # with open('sleep_data.json') as json_file:
-        #     sleep_data = json.load(json_file)
+        # heart_data = self.fitbit_api_client.get_heart_rate_data_for_dates(startTime,endTime,detail_level)
+        with open('heart_rate.json') as json_file:
+            multiple_heart_data = json.load(json_file)
 
-        # user_id = hashlib.sha256(b"example_user").hexdigest()
-        user_id = hashlib.sha256(self.fitbit_api_client.USER_ID.encode('utf-8')).hexdigest()
-        print(heart_data)
+        user_id = hashlib.sha256(b"example_user").hexdigest()
+        # user_id = hashlib.sha256(self.fitbit_api_client.USER_ID.encode('utf-8')).hexdigest()
         # Iterate through sleep data
-        for item in heart_data['activities-heart']:
-            document = {
-                "id": user_id,
-                "type": "heart",
-                "date": item['dateTime'],
-                "heartRateZones": item['value']['heartRateZones']
-            }
-            self.collection.insert_one(document)
+        for heart_data in multiple_heart_data:
+            for item in heart_data['activities-heart']:
+                document = {
+                    "id": user_id,
+                    "type": "heart",
+                    "date": item['dateTime'],
+                    "heartRateZones": item['value']['heartRateZones']
+                }
+                self.collection.insert_one(document)
 
-        intraday_data = heart_data['activities-heart-intraday']['dataset']
-        intraday_document = {
-            "id": user_id,
-            "type": "intraday_heart",
-            "date": heart_data['activities-heart-intraday']['dataset'],
-            "data": intraday_data
-        }
-        self.collection.insert_one(intraday_document)
+        #TODO: ADD INTRADAY DATA IN MONGO HERE
         return
 
 
@@ -96,5 +89,5 @@ client = FitbitMongoClient(
 )
 startTime = date(year = 2023, month = 4, day = 18)
 endTime = date.today()
-client.import_sleep_data_for_daterange()
+# client.import_sleep_data_for_daterange()
 client.import_heart_data_for_daterange(startTime=startTime,endTime=endTime)
