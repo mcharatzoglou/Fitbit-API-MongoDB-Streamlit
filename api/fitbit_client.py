@@ -29,63 +29,6 @@ class FitbitApiClient:
             self.fitbit_client = None
             raise Exception(e)
 
-
-    def get_sleep_for_daterange(self, startTime=None, endTime=None):
-
-        date_list = []
-        df_list = []
-        stages_df_list = []
-
-        allDates = pd.date_range(start=startTime, end=endTime)
-
-        for oneDate in allDates:
-            oneDate = oneDate.date().strftime("%Y-%m-%d")
-
-            oneDayData = self.fitbit_client.sleep(date=oneDate)
-            print(oneDayData)
-
-            # get number of minutes for each stage of sleep and such.
-            try:
-                stages_df = pd.DataFrame(oneDayData['summary'])
-                print(stages_df)
-            except: continue
-
-            df = pd.DataFrame(oneDayData['sleep'][0]['minuteData'])
-
-            date_list.append(oneDate)
-
-            df_list.append(df)
-
-            stages_df_list.append(stages_df)
-
-        final_df_list = []
-
-        final_stages_df_list = []
-
-        for date, df, stages_df in zip(date_list, df_list, stages_df_list):
-
-            if len(df) == 0:
-                continue
-
-            df.loc[:, 'date'] = pd.to_datetime(date)
-
-            stages_df.loc[:, 'date'] = pd.to_datetime(date)
-
-            final_df_list.append(df)
-            final_stages_df_list.append(stages_df)
-
-        final_df = pd.concat(final_df_list, axis=0)
-
-        final_stages_df = pd.concat(final_stages_df_list, axis=0)
-
-        columns = final_stages_df.columns[~final_stages_df.columns.isin(['date'])].values
-
-        pd.concat([final_stages_df[columns] + 2, final_stages_df[['date']]], axis=1)
-
-        # Export file to csv
-        final_df.to_csv('minuteSleep' + '.csv', index=False)
-        final_stages_df.to_csv('minutesStagesSleep' + '.csv', index=True)
-
     def get_all_hrv_data(self, startDate=None, endDate=None):
         # Fitbit API endpoint
         url = "https://api.fitbit.com/1/user/{user_id}/hrv/date/{date}.json"
@@ -111,7 +54,7 @@ class FitbitApiClient:
         else:
             print("Error:", response.status_code, response.text)
 
-    def get_heart_rate_data(self, startDate=None, endDate=None, output_file=None):
+    def get_heart_rate_data_for_datarange(self, startDate=None, endDate=None, detail_level="1min"):
         # Retrieve the user's join date
         user_profile = self.fitbit_client.user_profile_get()
         oldest_date = user_profile["user"]["memberSince"]
@@ -123,30 +66,28 @@ class FitbitApiClient:
         # Set the end date as yesterday's date if end date is not specified
         endDate = endDate or datetime.now().date() - timedelta(days=1)
 
-        # Create an empty list to store the HRV data
-        hrv_data = []
+        # Fitbit API endpoint
+        url = "https://api.fitbit.com/1/user/{user_id}/activities/heart/date/{start_date}/{end_date}/{detail_level}.json"
 
-        # Loop through each day from the start date to end date
-        current_date = startDate
-        while current_date <= endDate:
-            # Retrieve HRV data for the current date
-            hrv_data_for_day = self.fitbit_client.intraday_time_series("activities/heart", base_date=current_date,
-                                                                       detail_level="1min")
-            if "activities-heart-intraday" in hrv_data_for_day:
-                hrv_data_for_day = hrv_data_for_day["activities-heart-intraday"]["dataset"]
-                for data_point in hrv_data_for_day:
-                    hrv_data.append([current_date.strftime('%Y-%m-%d'), data_point["time"], data_point["value"]])
-            # Move on to the next day
-            current_date += timedelta(days=1)
+        # User and date information
+        user_id = self.USER_ID
 
-        # Write the HRV data to a CSV file
-        if output_file:
-            with open(output_file, "w", newline='') as csv_file:
-                writer = csv.writer(csv_file)
-                writer.writerow(["date", "time", "heart_rate"])
-                writer.writerows(hrv_data)
+        # Authorization header
+        access_token = self.ACCESS_TOKEN
+        headers = {"Authorization": "Bearer " + access_token}
 
-        return hrv_data
+        # Make the API request
+        print(url.format(user_id=user_id, start_date=startDate, end_date=endDate, detail_level=detail_level))
+        response = requests.get(url.format(user_id=user_id, start_date=startDate, end_date=endDate, detail_level=detail_level), headers=headers)
+
+        # Check the response status code
+        if response.status_code == 200:
+            # Parse the sleep data from the JSON response
+            heart_data = response.json()
+            return heart_data
+        else:
+            print("Error:", response.status_code, response.text)
+            return None
 
     def get_sleep_data_for_datarange(self,startDate=None,endDate=None):
         # Retrieve the user's join date
@@ -171,7 +112,6 @@ class FitbitApiClient:
         headers = {"Authorization": "Bearer " + access_token}
 
         # Make the API request
-        print(url.format(user_id=user_id, start_date=startDate, end_date=endDate))
         response = requests.get(url.format(user_id=user_id, start_date=startDate, end_date=endDate), headers=headers)
 
         # Check the response status code
@@ -181,8 +121,7 @@ class FitbitApiClient:
             return sleep_data
         else:
             print("Error:", response.status_code, response.text)
-
-        return
+            return None
 
 
 
