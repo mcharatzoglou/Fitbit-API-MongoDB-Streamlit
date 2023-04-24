@@ -43,14 +43,13 @@ class FitbitApiClient:
         headers = {"Authorization": "Bearer " + access_token}
 
         # Make the API request
-        print(url.format(user_id=user_id, date=date))
         response = requests.get(url.format(user_id=user_id, date=date), headers=headers)
 
         # Check the response status code
         if response.status_code == 200:
             # Parse the HRV data from the JSON response
             hrv_data = response.json()
-            print(hrv_data)
+            return hrv_data
         else:
             print("Error:", response.status_code, response.text)
 
@@ -115,7 +114,6 @@ class FitbitApiClient:
         for d in allDates:
             # Construct the URL for the current date
             one_day_url = url.format(user_id=user_id, oneDay=d.strftime("%Y-%m-%d"), detail_level=detail_level)
-            print(one_day_url)
 
             # Make the API request for the current date
             response = requests.get(one_day_url, headers=headers)
