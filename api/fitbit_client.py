@@ -54,44 +54,6 @@ class FitbitApiClient:
         else:
             print("Error:", response.status_code, response.text)
 
-    def get_heart_rate_data_for_datarange(self, startDate=None, endDate=None, detail_level="1min"):
-        # Retrieve the user's join date
-        user_profile = self.fitbit_client.user_profile_get()
-        oldest_date = user_profile["user"]["memberSince"]
-        oldest_date = datetime.strptime(oldest_date, "%Y-%m-%d").date()
-
-        # Set the start date as the oldest available HRV data if start date is not specified
-        startDate = startDate or oldest_date
-
-        # Set the end date as yesterday's date if end date is not specified
-        endDate = endDate or datetime.now().date() - timedelta(days=1)
-
-
-        # Fitbit API endpoint
-        url = "https://api.fitbit.com/1/user/{user_id}/activities/heart/date/{start_date}/{end_date}/{detail_level}.json"
-
-        # User and date information
-        user_id = self.USER_ID
-
-        # Authorization header
-        access_token = self.ACCESS_TOKEN
-        headers = {"Authorization": "Bearer " + access_token}
-
-        # Make the API request
-        print(url.format(user_id=user_id, start_date=startDate, end_date=endDate, detail_level=detail_level))
-        response = requests.get(url.format(user_id=user_id, start_date=startDate, end_date=endDate, detail_level=detail_level), headers=headers)
-
-        # Check the response status code
-        if response.status_code == 200:
-            # Parse the sleep data from the JSON response
-            heart_data = response.json()
-            with open("heart_rate.json", "w") as outfile:
-                json.dump(heart_data, outfile)
-            return heart_data
-        else:
-            print("Error:", response.status_code, response.text)
-            return None
-
     def get_sleep_data_for_datarange(self,startDate=None,endDate=None):
         # Retrieve the user's join date
         user_profile = self.fitbit_client.user_profile_get()
@@ -126,7 +88,7 @@ class FitbitApiClient:
             print("Error:", response.status_code, response.text)
             return None
 
-    def get_heart_rate_data_for_dates(self, startDate=None, endDate=None, detail_level="1min"):
+    def get_heart_rate_data_for_datarange(self, startDate=None, endDate=None, detail_level="1min"):
         # Retrieve the user's join date
         user_profile = self.fitbit_client.user_profile_get()
         oldest_date = user_profile["user"]["memberSince"]
