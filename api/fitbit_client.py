@@ -1,10 +1,8 @@
 import pandas as pd
 import fitbit
 import api.gather_keys_oauth2 as Oauth2
-from datetime import date,timedelta,datetime
+from datetime import timedelta,datetime
 import requests
-import csv
-import json
 
 class FitbitApiClient:
     """
@@ -21,73 +19,76 @@ class FitbitApiClient:
         try:
             server = Oauth2.OAuth2Server(client_id, client_secret)
             server.browser_authorize()
-            self.ACCESS_TOKEN = str(server.fitbit.client.session.token['access_token'])
-            self.REFRESH_TOKEN = str(server.fitbit.client.session.token['refresh_token'])
-            self.USER_ID = str(server.fitbit.client.session.token['user_id'])
-            self.fitbit_client = fitbit.Fitbit(client_id, client_secret, oauth2=True, access_token=self.ACCESS_TOKEN, refresh_token=self.REFRESH_TOKEN)
+            token = server.fitbit.client.session.token
+            self.ACCESS_TOKEN = str(token['access_token'])
+            self.REFRESH_TOKEN = str(token['refresh_token'])
+            self.USER_ID = str(token['user_id'])
+            self.fitbit_client = fitbit.Fitbit(
+                client_id, client_secret, oauth2=True, access_token=self.ACCESS_TOKEN, refresh_token=self.REFRESH_TOKEN)
         except Exception as e:
             self.fitbit_client = None
             raise Exception(e)
 
-    def get_all_hrv_data(self, startDate=None, endDate=None):
-        # Fitbit API endpoint
-        url = "https://api.fitbit.com/1/user/{user_id}/hrv/date/{date}.json"
-        #url = "https://api.fitbit.com/1.2/user/{user_id}/sleep/date/{date}.json"
+    def get_sleep_data_for_data_range(self, startDate=None, endDate=None):
+        """
+        Retrieves sleep data for a specified date range. If no start or end date is provided, retrieves all sleep data.
 
-        # User and date information
-        user_id = self.USER_ID
-        date = "2023-04-21"
+        Args:
+            start_date (str, optional): Start date of range in YYYY-MM-DD format. Defaults to None.
+            end_date (str, optional): End date of range in YYYY-MM-DD format. Defaults to None.
 
-        # Authorization header
-        access_token = self.ACCESS_TOKEN
-        headers = {"Authorization": "Bearer " + access_token}
+        Returns:
+            list: List of sleep data dictionaries. Each dictionary contains 'date' and 'duration' keys.
+        """
+        try:
+            # Retrieve the user's join date
+            user_profile = self.fitbit_client.user_profile_get()
+            oldest_date = user_profile["user"]["memberSince"]
+            oldest_date = datetime.strptime(oldest_date, "%Y-%m-%d").date()
 
-        # Make the API request
-        response = requests.get(url.format(user_id=user_id, date=date), headers=headers)
+            # Set the start date as the oldest available sleep data if start date is not specified
+            startDate = startDate or oldest_date
 
-        # Check the response status code
-        if response.status_code == 200:
-            # Parse the HRV data from the JSON response
-            hrv_data = response.json()
-            return hrv_data
-        else:
-            print("Error:", response.status_code, response.text)
+            # Set the end date as yesterday's date if end date is not specified
+            endDate = endDate or datetime.now().date() - timedelta(days=1)
 
-    def get_sleep_data_for_datarange(self,startDate=None,endDate=None):
-        # Retrieve the user's join date
-        user_profile = self.fitbit_client.user_profile_get()
-        oldest_date = user_profile["user"]["memberSince"]
-        oldest_date = datetime.strptime(oldest_date, "%Y-%m-%d").date()
+            # Fitbit API endpoint
+            url = f"https://api.fitbit.com/1.2/user/{self.USER_ID}/sleep/date/{startDate}/{endDate}.json"
 
-        # Set the start date as the oldest available HRV data if start date is not specified
-        startDate = startDate or oldest_date
+            # Authorization header
+            access_token = self.ACCESS_TOKEN
+            headers = {"Authorization": f"Bearer {access_token}"}
 
-        # Set the end date as yesterday's date if end date is not specified
-        endDate = endDate or datetime.now().date() - timedelta(days=1)
+            # Make the API request
+            response = requests.get(url, headers=headers)
 
-        # Fitbit API endpoint
-        url = "https://api.fitbit.com/1.2/user/{user_id}/sleep/date/{start_date}/{end_date}.json"
+            # Check the response status code
+            if response.status_code == 200:
+                # Parse the sleep data from the JSON response
+                sleep_data = response.json()
+                return sleep_data
+            else:
+                print(f"Error retrieving sleep data: {response.status_code} - {response.text}")
+                return None
 
-        # User and date information
-        user_id = self.USER_ID
-
-        # Authorization header
-        access_token = self.ACCESS_TOKEN
-        headers = {"Authorization": "Bearer " + access_token}
-
-        # Make the API request
-        response = requests.get(url.format(user_id=user_id, start_date=startDate, end_date=endDate), headers=headers)
-
-        # Check the response status code
-        if response.status_code == 200:
-            # Parse the sleep data from the JSON response
-            sleep_data = response.json()
-            return sleep_data
-        else:
-            print("Error:", response.status_code, response.text)
+        except Exception as e:
+            print(f"Error retrieving sleep data: {e}")
             return None
 
-    def get_heart_rate_data_for_datarange(self, startDate=None, endDate=None, detail_level="1min"):
+    def get_heart_rate_data_for_data_range(self, startDate=None, endDate=None, detail_level="1min"):
+        """
+        Retrieve heart rate data for a specified date range, using the Fitbit API.
+
+        Args:
+            startDate (date, optional): The start date of the date range. If not specified, the oldest available HRV data is used.
+            endDate (date, optional): The end date of the date range. If not specified, yesterday's date is used.
+            detail_level (str, optional): The level of detail for the data. Possible values are "1sec", "1min", and "15min". Default is "1min".
+
+        Returns:
+            heart_data (list): A list of dictionaries containing the heart rate data for each day in the specified date range.
+
+        """
+
         # Retrieve the user's join date
         user_profile = self.fitbit_client.user_profile_get()
         oldest_date = user_profile["user"]["memberSince"]
@@ -98,7 +99,10 @@ class FitbitApiClient:
 
         # Set the end date as yesterday's date if end date is not specified
         endDate = endDate or datetime.now().date() - timedelta(days=1)
-        allDates = pd.date_range(start=startDate,end=endDate)
+
+        # Generate a list of all dates in the specified range
+        allDates = pd.date_range(start=startDate, end=endDate)
+
         # Fitbit API endpoint
         url = "https://api.fitbit.com/1/user/{user_id}/activities/heart/date/{oneDay}/1d/{detail_level}.json"
 
@@ -109,7 +113,7 @@ class FitbitApiClient:
         access_token = self.ACCESS_TOKEN
         headers = {"Authorization": "Bearer " + access_token}
 
-        # Make the API requests
+        # Make the API requests for each day in the range
         heart_data = []
         for d in allDates:
             # Construct the URL for the current date
@@ -123,20 +127,8 @@ class FitbitApiClient:
                 # Parse the heart rate data from the JSON response
                 heart_data.append(response.json())
             else:
+                # If the request fails, print an error message with the status code and response text
                 print(f"Error retrieving heart rate data for {d}: {response.status_code} - {response.text}")
 
-        # Save the heart rate data to a file
-        with open("heart_rate.json", "w") as outfile:
-            json.dump(heart_data, outfile)
-
         return heart_data
-
-
-CLIENT_ID = '23QRJ6'
-CLIENT_SECRET = 'abb49f0cdfcfd2605f02fcae11dda3b4'
-# item = FitbitApiClient(CLIENT_ID,CLIENT_SECRET)
-# hrv_data_by_date = item.get_all_hrv_data()
-# hrv_data_by_date = item.get_all_hrv_data(startTime,endTime)
-startTime = date(year = 2023, month = 4, day = 18)
-endTime = date.today()
 
