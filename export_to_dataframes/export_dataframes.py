@@ -56,8 +56,99 @@ class MongoClientDataframes:
         df = pd.DataFrame(data)
 
         # Save the dataframe to a CSV file with a descriptive file name
-        filename = f"heart_rate_data_{start_date_string}_{end_date_string}.csv"
-        df.to_csv(filename, index=False)
+        # filename = f"heart_rate_data_{start_date_string}_{end_date_string}.csv"
+        # df.to_csv(filename, index=False)
+
+        # Return the pandas dataframe
+        return df
+
+    def dataframe_heart_summary(self, start_date=None, end_date=None):
+        # If start_date and end_date are not specified, set them to today's date
+        start_date = start_date or datetime.now().date()
+        end_date = end_date or datetime.now().date()
+
+        # Convert the start and end dates to datetime objects
+        start_datetime = datetime.combine(start_date, datetime.min.time())
+        end_datetime = datetime.combine(end_date, datetime.max.time())
+
+        # Format the start and end dates as strings in "YYYY-MM-DD" format
+        date_format = "%Y-%m-%d"
+        start_date_string = start_datetime.strftime(date_format)
+        end_date_string = end_datetime.strftime(date_format)
+
+        # Query the MongoDB collection for heart rate data between the start and end dates
+        query = {
+            "type": "heart", # Select documents with "type" equal to "heart"
+            "date": { # Select documents where "date" is between the start and end dates
+                "$gte": start_date_string, # Greater than or equal to start date
+                "$lte": end_date_string  # Less than or equal to end date
+            }
+        }
+        results = self.collection.find(query)
+
+        # Extract heart rate data from the MongoDB documents and store it as a list of dictionaries
+        data = [
+            {
+                'date': result['date'], # Date of the document
+                'caloriesOut': item['caloriesOut'], # Number calories burned with the specified heart rate zone
+                'max': item['max'], # Maximum range for the heart rate zone
+                'min': item['min'], # Minimum range for the heart rate zone
+                'minutes': item['minutes'], # Number minutes withing the specified heart rate zone
+                'name': item['name'] # Name of the heart rate zone
+            }
+            for result in results
+            for item in result['heartRateZones'] # Loop through the heart rate measurements for each document
+        ]
+
+        # Create a pandas dataframe from the list of dictionaries
+        df = pd.DataFrame(data)
+
+        # Save the dataframe to a CSV file with a descriptive file name
+        # filename = f"heart_rate_summary_{start_date_string}_{end_date_string}.csv"
+        # df.to_csv(filename, index=False)
+
+        # Return the pandas dataframe
+        return df
+
+    def dataframe_heart_resting_heart_rate(self, start_date=None, end_date=None):
+        # If start_date and end_date are not specified, set them to today's date
+        start_date = start_date or datetime.now().date()
+        end_date = end_date or datetime.now().date()
+
+        # Convert the start and end dates to datetime objects
+        start_datetime = datetime.combine(start_date, datetime.min.time())
+        end_datetime = datetime.combine(end_date, datetime.max.time())
+
+        # Format the start and end dates as strings in "YYYY-MM-DD" format
+        date_format = "%Y-%m-%d"
+        start_date_string = start_datetime.strftime(date_format)
+        end_date_string = end_datetime.strftime(date_format)
+
+        # Query the MongoDB collection for heart rate data between the start and end dates
+        query = {
+            "type": "heart", # Select documents with "type" equal to "heart"
+            "date": { # Select documents where "date" is between the start and end dates
+                "$gte": start_date_string, # Greater than or equal to start date
+                "$lte": end_date_string  # Less than or equal to end date
+            }
+        }
+        results = self.collection.find(query)
+
+        # Extract heart rate data from the MongoDB documents and store it as a list of dictionaries
+        data = []
+        for result in results:
+            if 'restingHeartrate' in result:
+                data.append({
+                    'date': result['date'],
+                    'restingHeartRate': result['restingHeartrate'] # Resting heart rate value for the day (daily)
+                })
+
+        # Create a pandas dataframe from the list of dictionaries
+        df = pd.DataFrame(data)
+
+        # Save the dataframe to a CSV file with a descriptive file name
+        # filename = f"heart_resting_heart_rate_{start_date_string}_{end_date_string}.csv"
+        # df.to_csv(filename, index=False)
 
         # Return the pandas dataframe
         return df
@@ -71,3 +162,5 @@ client = MongoClientDataframes(
 startTime = date(year = 2023, month = 4, day = 20)
 endTime =  date(year = 2023, month = 4, day = 20)
 client.dataframe_heart_rate(start_date=startTime)
+client.dataframe_heart_summary(start_date=startTime)
+client.dataframe_heart_resting_heart_rate(start_date=startTime)
