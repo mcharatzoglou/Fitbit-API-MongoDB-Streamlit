@@ -1,3 +1,4 @@
+#from fitbit_client import FitbitApiClient
 from api.fitbit_client import FitbitApiClient
 from datetime import date, timedelta
 import hashlib
@@ -28,6 +29,7 @@ class FitbitMongoClient:
 
             # Initialize Fitbit API client
             self.fitbit_api_client = FitbitApiClient(fitbit_client_id, fitbit_client_secret)
+
         except Exception as e:
             # If any error occurs, set objects to None and raise an exception
             self.mongo_client = None
