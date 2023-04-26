@@ -174,7 +174,6 @@ class FitbitMongoClient:
         user_id = hashlib.sha256(self.fitbit_api_client.USER_ID.encode('utf-8')).hexdigest()
 
         # Iterate through each heart rate data point
-        print(multiple_hrv_data['hrv'])
         for hrv in multiple_hrv_data['hrv']:
             # Extract relevant data and create a document to be inserted into the database
             document = {
