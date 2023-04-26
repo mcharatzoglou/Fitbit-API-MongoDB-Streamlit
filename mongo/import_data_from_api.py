@@ -36,57 +36,6 @@ class FitbitMongoClient:
             self.fitbit_api_client = None
             raise Exception(e)
 
-
-    def import_sleep_data_for_daterange(self, start_date=None, end_date=None):
-        """
-        Import sleep data for a specified date range from the Fitbit API and insert it into MongoDB.
-
-        Args:
-        - start_date: start date of the date range (default: None, which means 1 week ago)
-        - end_date: end date of the date range (default: None, which means today)
-
-        Returns:
-        - None
-        """
-        # If start date is not provided, set it to 1 week ago
-        if start_date is None:
-            start_date = date.today() - timedelta(days=7)
-
-        # If end date is not provided, set it to today
-        if end_date is None:
-            end_date = date.today()
-
-        # Convert start and end dates to ISO format expected by the Fitbit API
-        start_date_str = start_date.isoformat()
-        end_date_str = end_date.isoformat()
-
-        # Fetch sleep data for the specified date range from the Fitbit API
-        sleep_data = self.fitbit_api_client.get_sleep_data_for_data_range(start_date_str, end_date_str)
-
-        # Get the SHA256 hash of the Fitbit user ID for the current API client
-        user_id = hashlib.sha256(self.fitbit_api_client.USER_ID.encode('utf-8')).hexdigest()
-
-        # Iterate through sleep data and insert each record into MongoDB
-        for item in sleep_data['sleep']:
-            document = {
-                "id": user_id,
-                "type": "sleep",
-                "dateOfSleep": item['dateOfSleep'],
-                "metrics": {
-                    "startTime": item['startTime'],
-                    "endTime": item['endTime'],
-                    "duration": item['duration'],
-                    "efficiency": item['efficiency'],
-                    "minutesAsleep": item['minutesAsleep'],
-                    "minutesAwake": item['minutesAwake'],
-                    "minutesToFallAsleep": item['minutesToFallAsleep'],
-                    "timeInBed": item['timeInBed'],
-                },
-                "summary": item['levels']['summary'],
-                "data": item['levels']['data'],
-            }
-            self.collection.insert_one(document)
-
     def import_sleep_data_for_daterange(self, startTime=None, endTime=None):
         sleep_data = self.fitbit_api_client.get_sleep_data_for_data_range(startTime,endTime)
         user_id = hashlib.sha256(self.fitbit_api_client.USER_ID.encode('utf-8')).hexdigest()
