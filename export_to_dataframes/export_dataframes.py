@@ -152,6 +152,48 @@ class MongoClientDataframes:
 
         # Return the pandas dataframe
         return df
+    def dataframe_hrv(self, start_date=None, end_date=None):
+        # If start_date and end_date are not specified, set them to today's date
+        start_date = start_date or datetime.now().date()
+        end_date = end_date or datetime.now().date()
+
+        # Convert the start and end dates to datetime objects
+        start_datetime = datetime.combine(start_date, datetime.min.time())
+        end_datetime = datetime.combine(end_date, datetime.max.time())
+
+        # Format the start and end dates as strings in "YYYY-MM-DD" format
+        date_format = "%Y-%m-%d"
+        start_date_string = start_datetime.strftime(date_format)
+        end_date_string = end_datetime.strftime(date_format)
+
+        # Query the MongoDB collection for heart rate data between the start and end dates
+        query = {
+            "type": "hrv", # Select documents with "type" equal to "heart"
+            "date": { # Select documents where "date" is between the start and end dates
+                "$gte": start_date_string, # Greater than or equal to start date
+                "$lte": end_date_string  # Less than or equal to end date
+            }
+        }
+        results = self.collection.find(query)
+
+        # Extract heart rate data from the MongoDB documents and store it as a list of dictionaries
+        data = []
+        for result in results:
+                data.append({
+                    'date': result['date'],
+                    'daily_rmssd': result['dailyRmssd'], # The Root Mean Square of Successive Differences (RMSSD) between heart beats. It measures short-term variability in the user’s daily heart rate in milliseconds (ms).
+                    'deep_rmssd': result['deepRmssd'] # The Root Mean Square of Successive Differences (RMSSD) between heart beats. It measures short-term variability in the user’s heart rate while in deep sleep, in milliseconds (ms).
+                })
+
+        # Create a pandas dataframe from the list of dictionaries
+        df = pd.DataFrame(data)
+
+        # Save the dataframe to a CSV file with a descriptive file name
+        # filename = f"heart_hrv_{start_date_string}_{end_date_string}.csv"
+        # df.to_csv(filename, index=False)
+
+        # Return the pandas dataframe
+        return df
 
 # EXAMPLE CODE
 client = MongoClientDataframes(
@@ -164,3 +206,4 @@ endTime =  date(year = 2023, month = 4, day = 20)
 client.dataframe_heart_rate(start_date=startTime)
 client.dataframe_heart_summary(start_date=startTime)
 client.dataframe_heart_resting_heart_rate(start_date=startTime)
+client.dataframe_hrv(start_date=startTime)

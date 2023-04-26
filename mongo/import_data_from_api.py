@@ -38,57 +38,6 @@ class FitbitMongoClient:
             self.fitbit_api_client = None
             raise Exception(e)
 
-
-    def import_sleep_data_for_daterange(self, start_date=None, end_date=None):
-        """
-        Import sleep data for a specified date range from the Fitbit API and insert it into MongoDB.
-
-        Args:
-        - start_date: start date of the date range (default: None, which means 1 week ago)
-        - end_date: end date of the date range (default: None, which means today)
-
-        Returns:
-        - None
-        """
-        # If start date is not provided, set it to 1 week ago
-        if start_date is None:
-            start_date = date.today() - timedelta(days=7)
-
-        # If end date is not provided, set it to today
-        if end_date is None:
-            end_date = date.today()
-
-        # Convert start and end dates to ISO format expected by the Fitbit API
-        start_date_str = start_date.isoformat()
-        end_date_str = end_date.isoformat()
-
-        # Fetch sleep data for the specified date range from the Fitbit API
-        sleep_data = self.fitbit_api_client.get_sleep_data_for_data_range(start_date_str, end_date_str)
-
-        # Get the SHA256 hash of the Fitbit user ID for the current API client
-        user_id = hashlib.sha256(self.fitbit_api_client.USER_ID.encode('utf-8')).hexdigest()
-
-        # Iterate through sleep data and insert each record into MongoDB
-        for item in sleep_data['sleep']:
-            document = {
-                "id": user_id,
-                "type": "sleep",
-                "dateOfSleep": item['dateOfSleep'],
-                "metrics": {
-                    "startTime": item['startTime'],
-                    "endTime": item['endTime'],
-                    "duration": item['duration'],
-                    "efficiency": item['efficiency'],
-                    "minutesAsleep": item['minutesAsleep'],
-                    "minutesAwake": item['minutesAwake'],
-                    "minutesToFallAsleep": item['minutesToFallAsleep'],
-                    "timeInBed": item['timeInBed'],
-                },
-                "summary": item['levels']['summary'],
-                "data": item['levels']['data'],
-            }
-            self.collection.insert_one(document)
-
     def import_sleep_data_for_daterange(self, startTime=None, endTime=None):
         sleep_data = self.fitbit_api_client.get_sleep_data_for_data_range(startTime,endTime)
         user_id = hashlib.sha256(self.fitbit_api_client.USER_ID.encode('utf-8')).hexdigest()
@@ -158,6 +107,40 @@ class FitbitMongoClient:
         # Return True to indicate successful data import
         return True
 
+    def import_hrv_data_for_daterange(self, startTime=None, endTime=None):
+        """
+        The function imports Heart Rate Variability (HRV) from the Fitbit API for a given date range and saves it to a MongoDB collection.
+
+        Args:
+        startTime (str): Start date for data import in yyyy-MM-dd format. Defaults to None.
+        endTime (str): End date for data import in yyyy-MM-dd format. Defaults to None.
+
+        Returns:
+        bool: Returns True if data was successfully imported and saved to the collection.
+        """
+        # Retrieve heart rate data from Fitbit API for specified date range and detail level
+        multiple_hrv_data = self.fitbit_api_client.get_hrv_data_for_data_range(startTime, endTime)
+
+        # Hash user ID to maintain anonymity
+        user_id = hashlib.sha256(self.fitbit_api_client.USER_ID.encode('utf-8')).hexdigest()
+
+        # Iterate through each heart rate data point
+        for hrv in multiple_hrv_data['hrv']:
+            # Extract relevant data and create a document to be inserted into the database
+            document = {
+                "id": user_id,
+                "type": "hrv",
+                "date": hrv['dateTime'],
+                "dailyRmssd": hrv['value']['dailyRmssd'],
+                "deepRmssd": hrv['value']['deepRmssd']
+            }
+
+            # Insert document into database collection
+            self.collection.insert_one(document)
+
+        # Return True to indicate successful data import
+        return True
+
 
 # EXAMPLE CODE
 client = FitbitMongoClient(
@@ -171,3 +154,4 @@ startTime = date(year = 2023, month = 4, day = 22)
 endTime = date.today()
 client.import_sleep_data_for_daterange()
 client.import_heart_data_for_daterange()
+client.import_hrv_data_for_daterange()
