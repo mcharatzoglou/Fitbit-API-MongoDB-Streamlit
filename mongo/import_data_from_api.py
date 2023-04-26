@@ -46,7 +46,7 @@ class FitbitMongoClient:
             document = {
                 "id": user_id,
                 "type": "sleep",
-                "dateOfSleep": item['dateOfSleep'],
+                "date": item['dateOfSleep'],
                 "metrics": {
                     "startTime": item['startTime'],
                     "endTime": item['endTime'],
@@ -54,6 +54,7 @@ class FitbitMongoClient:
                     "efficiency": item['efficiency'],
                     "minutesAsleep": item['minutesAsleep'],
                     "minutesAwake": item['minutesAwake'],
+                    "minutesAfterWakeup": item['minutesAfterWakeup'],
                     "minutesToFallAsleep": item['minutesToFallAsleep'],
                     "timeInBed": item['timeInBed'],
                 },
