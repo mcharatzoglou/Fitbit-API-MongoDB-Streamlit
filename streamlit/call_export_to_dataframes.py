@@ -1,5 +1,11 @@
 from export_to_dataframes.export_dataframes import MongoClientDataframes
 from datetime import date
+import export_to_dataframes.export_dataframes
+
+import sys
+sys.path.append('../export_to_dataframes')
+from export_dataframes import MongoClientDataframes
+
 
 client = MongoClientDataframes(
     connection_string = "mongodb://localhost:27017/",
