@@ -209,7 +209,7 @@ class MongoClientDataframes:
         start_date_string = start_datetime.strftime(date_format)
         end_date_string = end_datetime.strftime(date_format)
 
-        # Query the MongoDB collection for heart rate data between the start and end dates
+        # Query the MongoDB collection for sleep data between the start and end dates
         query = {
             "type": "sleep", # Select documents with "type" equal to "sleep"
             "date": { # Select documents where "date" is between the start and end dates
@@ -256,7 +256,7 @@ class MongoClientDataframes:
         start_date_string = start_datetime.strftime(date_format)
         end_date_string = end_datetime.strftime(date_format)
 
-        # Query the MongoDB collection for heart rate data between the start and end dates
+        # Query the MongoDB collection for sleep data between the start and end dates
         query = {
             "type": "sleep", # Select documents with "type" equal to "sleep"
             "date": { # Select documents where "date" is between the start and end dates
@@ -294,6 +294,50 @@ class MongoClientDataframes:
         # Return the pandas dataframe
         return df
 
+    def dataframe_sleep_summary(self, start_date=None, end_date=None):
+        # If start_date and end_date are not specified, set them to today's date
+        start_date = start_date or datetime.now().date()
+        end_date = end_date or datetime.now().date()
+
+        # Convert the start and end dates to datetime objects
+        start_datetime = datetime.combine(start_date, datetime.min.time())
+        end_datetime = datetime.combine(end_date, datetime.max.time())
+
+        # Format the start and end dates as strings in "YYYY-MM-DD" format
+        date_format = "%Y-%m-%d"
+        start_date_string = start_datetime.strftime(date_format)
+        end_date_string = end_datetime.strftime(date_format)
+
+        # Query the MongoDB collection for sleep data between the start and end dates
+        query = {
+            "type": "sleep", # Select documents with "type" equal to "sleep"
+            "date": { # Select documents where "date" is between the start and end dates
+                "$gte": start_date_string, # Greater than or equal to start date
+                "$lte": end_date_string  # Less than or equal to end date
+            }
+        }
+        results = self.collection.find(query)
+
+        # Extract sleep data from the MongoDB documents and store it as a list of dictionaries
+        data = []
+
+        rows = []
+        for doc in results:
+            date = doc['date']
+            for stage in ['deep', 'light', 'rem', 'wake']:
+                if stage in doc['summary']:
+                    minutes = doc['summary'][stage]['minutes']
+                    count = doc['summary'][stage]['count']
+                    rows.append([date, stage, minutes, count])
+        df = pd.DataFrame(rows, columns=['date', 'stage', 'totalMinutesAsleep', 'totalSleepRecords'])
+
+        # Save the dataframe to a CSV file with a descriptive file name
+        filename = f"sleep_summary_data_{start_date_string}_{end_date_string}.csv"
+        df.to_csv(filename, index=False)
+
+        # Return the pandas dataframe
+        return df
+
 # EXAMPLE CODE
 client = MongoClientDataframes(
     connection_string = "mongodb://localhost:27017/",
@@ -308,3 +352,4 @@ endTime =  date(year = 2023, month = 4, day = 20)
 # client.dataframe_hrv(start_date=startTime)
 # client.dataframe_sleep(start_date=startTime)
 # client.dataframe_sleep_metrics(start_date=startTime)
+# client.dataframe_sleep_summary(start_date=startTime)
