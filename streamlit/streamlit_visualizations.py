@@ -108,8 +108,18 @@ def hr_pie_chart():
         fig, ax = plt.subplots()
         names = filtered_df["name"].values
         dur = filtered_df["minutes"].values
-        #colors = ['red', 'orange', 'yellow', 'green', 'blue']
-        ax.pie(dur, labels=names)
+        total_dur = np.sum(dur)
+        percentages = [d/total_dur*100 for d in dur]
+        zone_colors = dict()
+        zone_colors["Out of Range"] = 'red'
+        zone_colors["Fat Burn"] = "green"
+        zone_colors["Cardio"] = "blue"
+        zone_colors["Peak"] = "yellow"
+        ax.pie(percentages, labels=None, 
+               autopct=None, colors=[zone_colors[z] for z in names])
+        # Create a legend
+        legend_labels = [f'{z} ({p:.1f}%)' for z, p in zip(names, percentages)]
+        ax.legend(legend_labels, loc='best', bbox_to_anchor=(1.0, 0.5))        
         ax.set_title(f"Heart Rate Zone Distribution for {start_date}")
         st.pyplot(fig)
 
@@ -147,13 +157,23 @@ def hr_pie_chart_avg():
         #create the plot
         fig, ax = plt.subplots()
         names = set(filtered_df["name"].values)
+        #get total number of minutes
+        total_dur = np.sum(filtered_df["minutes"].values)
         zone_dict = dict() #dict zone name: average duration in minutes
         for name in names:
             #get a df for each zone
             zone_df = filtered_df[filtered_df["name"]==name]
-            zone_dict[name]=np.mean(zone_df["minutes"].values)
-        colors = ['red', 'orange', 'yellow', 'green', 'blue']
-        ax.pie(zone_dict.values(), labels=zone_dict.keys(), colors=colors)
+            dur = filtered_df["minutes"].values
+            zone_dict[name]=(np.sum(zone_df["minutes"].values)/total_dur)*100
+        zone_colors = dict()
+        zone_colors["Out of Range"] = 'red'
+        zone_colors["Fat Burn"] = "green"
+        zone_colors["Cardio"] = "blue"
+        zone_colors["Peak"] = "yellow"
+        ax.pie(zone_dict.values(), labels=None, 
+               colors=[zone_colors[z] for z in names])
+        legend_labels = [f'{z} ({p:.1f}%)' for z, p in zip(zone_dict.keys(), zone_dict.values())]
+        ax.legend(legend_labels, loc='best', bbox_to_anchor=(1.0, 0.5)) 
         ax.set_title(f"Heart Rate Zone Distribution from {start_date} to {end_date}")
         st.pyplot(fig)
       
@@ -184,7 +204,19 @@ def calorie_bar():
         #create the plot
         names = filtered_df["name"].values
         cal = filtered_df["caloriesOut"].values
-        fig, ax = plt.subplots()
+        final_names, final_cal = [], []
+        #plot only the zones with calories>0
+        '''for i in range(len(names)):
+            if cal[i]>0:
+                final_names.append(names[i])
+                final_cal.append(cal[i])
+        if len(final_names)>2:
+            figsize = (8, 5)
+        else:
+            figsize = (1, 5)
+        fig, ax = plt.subplots(figsize=figsize)
+        ax.bar(final_names, final_cal)'''
+        fig, ax = plt.subplots(figsize = (8, 5))
         ax.bar(names, cal)
         ax.set_xlabel('Heart Rate Zone')
         ax.set_ylabel('Calories Burnt')
@@ -225,7 +257,7 @@ def calorie_bar_avg():
             #get a df for each zone
             zone_df = filtered_df[filtered_df["name"]==name]
             calorie_dict[name]=np.mean(zone_df["caloriesOut"].values)
-        fig, ax = plt.subplots()
+        fig, ax = plt.subplots(figsize = (8, 5))
         ax.bar(calorie_dict.keys(), calorie_dict.values())
         ax.set_xlabel('Heart Rate Zone')
         ax.set_ylabel('Calories Burnt')
