@@ -41,39 +41,34 @@ class FitbitApiClient:
         Returns:
             list: List of sleep data dictionaries. Each dictionary contains 'date' and 'duration' keys.
         """
-        try:
-            # Retrieve the user's join date
-            user_profile = self.fitbit_client.user_profile_get()
-            oldest_date = user_profile["user"]["memberSince"]
-            oldest_date = datetime.strptime(oldest_date, "%Y-%m-%d").date()
+        # Retrieve the user's join date
+        user_profile = self.fitbit_client.user_profile_get()
+        oldest_date = user_profile["user"]["memberSince"]
+        oldest_date = datetime.strptime(oldest_date, "%Y-%m-%d").date()
 
-            # Set the start date as the oldest available sleep data if start date is not specified
-            startDate = startDate or oldest_date
+        # Set the start date as the oldest available sleep data if start date is not specified
+        startDate = startDate or oldest_date
 
-            # Set the end date as yesterday's date if end date is not specified
-            endDate = endDate or datetime.now().date() - timedelta(days=1)
+        # Set the end date as yesterday's date if end date is not specified
+        endDate = endDate or datetime.now().date() - timedelta(days=1)
 
-            # Fitbit API endpoint
-            url = f"https://api.fitbit.com/1.2/user/{self.USER_ID}/sleep/date/{startDate}/{endDate}.json"
+        # Fitbit API endpoint
+        url = f"https://api.fitbit.com/1.2/user/{self.USER_ID}/sleep/date/{startDate}/{endDate}.json"
 
-            # Authorization header
-            access_token = self.ACCESS_TOKEN
-            headers = {"Authorization": f"Bearer {access_token}"}
+        # Authorization header
+        access_token = self.ACCESS_TOKEN
+        headers = {"Authorization": f"Bearer {access_token}"}
 
-            # Make the API request
-            response = requests.get(url, headers=headers)
+        # Make the API request
+        response = requests.get(url, headers=headers)
 
-            # Check the response status code
-            if response.status_code == 200:
-                # Parse the sleep data from the JSON response
-                sleep_data = response.json()
-                return sleep_data
-            else:
-                print(f"Error retrieving sleep data: {response.status_code} - {response.text}")
-                return None
-
-        except Exception as e:
-            print(f"Error retrieving sleep data: {e}")
+        # Check the response status code
+        if response.status_code == 200:
+            # Parse the sleep data from the JSON response
+            sleep_data = response.json()
+            return sleep_data
+        else:
+            print(f"Error retrieving sleep data: {response.status_code} - {response.text}")
             return None
 
     def get_heart_rate_data_for_data_range(self, startDate=None, endDate=None, detail_level="1min"):
@@ -152,8 +147,13 @@ class FitbitApiClient:
         oldest_date = user_profile["user"]["memberSince"]
         oldest_date = datetime.strptime(oldest_date, "%Y-%m-%d").date()
 
+        # It is more safe ti retrieve the HRV for the next day of the member subscription becasue ftibit api return error before that date only in HRV
+        oldest_date = oldest_date + timedelta(days=1)
+
         # Set the start date as the oldest available HRV data if start date is not specified
         startDate = startDate or oldest_date
+        if startDate < oldest_date:
+            startDate = oldest_date
 
         # Set the end date as yesterday's date if end date is not specified
         endDate = endDate or datetime.now().date() - timedelta(days=1)
@@ -162,7 +162,6 @@ class FitbitApiClient:
         # Fitbit API endpoint
         url = f"https://api.fitbit.com/1/user/{self.USER_ID}/hrv/date/{startDate}/{endDate}.json"
 
-
         # Authorization header
         access_token = self.ACCESS_TOKEN
         headers = {"Authorization": f"Bearer {access_token}"}
@@ -170,12 +169,13 @@ class FitbitApiClient:
         # Make the API request
         response = requests.get(url, headers=headers)
 
+
         # Check the response status code
         if response.status_code == 200:
             # Parse the sleep data from the JSON response
             hrv_data = response.json()
             return hrv_data
         else:
-            print(f"Error retrieving sleep data: {response.status_code} - {response.text}")
+            print(f"Error retrieving HRV data: {response.status_code} - {response.text}")
             return None
 

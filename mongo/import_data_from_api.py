@@ -1,4 +1,3 @@
-#from fitbit_client import FitbitApiClient
 from api.fitbit_client import FitbitApiClient
 from datetime import date, timedelta
 import hashlib
@@ -42,8 +41,15 @@ class FitbitMongoClient:
         sleep_data = self.fitbit_api_client.get_sleep_data_for_data_range(startTime,endTime)
         user_id = hashlib.sha256(self.fitbit_api_client.USER_ID.encode('utf-8')).hexdigest()
 
+
         # Iterate through sleep data
         for item in sleep_data['sleep']:
+
+            # Check if document already exists based on date
+            existing_doc = self.collection.find_one({"id": user_id, "type": "sleep", "date": item['dateOfSleep']})
+            if existing_doc:
+                continue
+
             # Create document for each data record
             document = {
                 "id": user_id,
@@ -80,6 +86,8 @@ class FitbitMongoClient:
         Returns:
         bool: Returns True if data was successfully imported and saved to the collection.
         """
+
+
         # Retrieve heart rate data from Fitbit API for specified date range and detail level
         multiple_heart_data = self.fitbit_api_client.get_heart_rate_data_for_data_range(startTime, endTime,
                                                                                         detail_level)
@@ -89,6 +97,11 @@ class FitbitMongoClient:
 
         # Iterate through each heart rate data point
         for heart_data in multiple_heart_data:
+            # Check if the document already exists in the collection
+            existing_document = self.collection.find_one(
+                {"id": user_id, "type": "heart", "date": heart_data['activities-heart'][0]['dateTime']})
+            if existing_document:
+                continue  # Skip if document already exists
             # Extract relevant data and create a document to be inserted into the database
             document = {
                 "id": user_id,
@@ -122,11 +135,15 @@ class FitbitMongoClient:
         # Retrieve heart rate data from Fitbit API for specified date range and detail level
         multiple_hrv_data = self.fitbit_api_client.get_hrv_data_for_data_range(startTime, endTime)
 
-        # Hash user ID to maintain anonymity
         user_id = hashlib.sha256(self.fitbit_api_client.USER_ID.encode('utf-8')).hexdigest()
 
-        # Iterate through each heart rate data point
         for hrv in multiple_hrv_data['hrv']:
+
+            existing_document = self.collection.find_one(
+                {"id": user_id, "type": "hrv", "date": hrv['dateTime']})
+            if existing_document:
+                continue  # Skip if document already exists
+
             # Extract relevant data and create a document to be inserted into the database
             document = {
                 "id": user_id,
@@ -151,7 +168,7 @@ client = FitbitMongoClient(
     fitbit_client_id= "23QRJ6",
     fitbit_client_secret= "abb49f0cdfcfd2605f02fcae11dda3b4",
 )
-startTime = date(year = 2023, month = 4, day = 22)
+startTime = date(year = 2023, month = 3, day = 27)
 endTime = date.today()
 client.import_sleep_data_for_daterange()
 client.import_heart_data_for_daterange()
