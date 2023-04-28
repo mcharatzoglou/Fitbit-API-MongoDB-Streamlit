@@ -243,8 +243,9 @@ def plot_sleep_timing():
     if filtered_df.empty:
         st.write("No data available for selected date.")
     else:
-        # format startTime column as datetime object
+        # format startTime and endTime columns as datetime objects
         filtered_df["startTime"] = pd.to_datetime(filtered_df["startTime"])
+        filtered_df["endTime"] = pd.to_datetime(filtered_df["endTime"])
 
         # Create the histogram
         fig, ax1 = plt.subplots(figsize=(10, 6))
@@ -253,11 +254,15 @@ def plot_sleep_timing():
         ax1.set_ylabel('Number of Days')
         ax1.set_title('Sleep Timing Histogram')
 
-        ax1.hist(filtered_df["startTime"].dt.hour, bins=48, color="orange", alpha=0.5)
+        ax1.hist(filtered_df["startTime"].dt.hour, bins=24, color="blue", alpha=0.5, label="Bedtime")
+        ax1.hist(filtered_df["endTime"].dt.hour, bins=24, color="green", alpha=0.5, label="Wake-up time")
+
         # Set x-axis tick positions to every hour
         ax1.set_xticks(range(0, 24))
+        ax1.legend()
+
         st.pyplot(fig)
 
-st.title("Sleep Timing Analysis")
+st.title("Average Sleep Timing Analysis")
 # Generate the histogram
 plot_sleep_timing()
