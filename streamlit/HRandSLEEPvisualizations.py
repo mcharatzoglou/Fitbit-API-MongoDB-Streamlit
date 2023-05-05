@@ -420,50 +420,7 @@ with container:
         plot_sleep_stages(data, date.strftime("%Y-%m-%d"))
 
 
-        # 3 Plot Average Sleep Duration Over Time
-        def plot_sleep_duration():
-            # Create Streamlit picker widgets
-            start_date = st.date_input("Select Starting Date",
-                                    value=dt.datetime.strptime("2023-03-27", "%Y-%m-%d"),
-                                    key="date5")
-            end_date = st.date_input("Select Ending Date",
-                                    value=dt.datetime.strptime("2023-04-28", "%Y-%m-%d"),
-                                    key="date6")
-
-            # get data from MongoDB as dataframe
-            client = MongoClientDataframes(
-                connection_string="mongodb://localhost:27017/",
-                database="local",
-                collection="fitbit",
-            )
-
-            filtered_df = client.dataframe_sleep_metrics(start_date, end_date)
-            if filtered_df.empty:
-                st.write("No data available for selected date.")
-            else:
-                # groupby date and calculate mean of sleep duration
-                filtered_df = filtered_df.groupby("date").mean()["minutesAsleep"].reset_index()
-
-                # Create the bar plot
-                fig, ax = plt.subplots(figsize=(10, 6))
-                ax.bar(filtered_df["date"], filtered_df["minutesAsleep"], color='pink')
-                ax.set_xlabel('Date')
-                ax.set_ylabel('Sleep Duration (minutes)')
-                ax.set_title('Average Sleep Duration over Time')
-                ax.tick_params(axis='x', rotation=45, labelsize=6)
-                ax.tick_params(axis='y', labelsize=6)
-                st.pyplot(fig)
-                plt.close(fig)
-
-
-        #st.title("Average Sleep Duration Over Time")
-        st.markdown("<h3 style='color: orange'>Average Sleep Duration Over Time</h3>", 
-                    unsafe_allow_html=True)
-        # Generate the bar plot
-        plot_sleep_duration()
-
-
-        # 4 Plot Duration VS Efficiency for comparison
+        # 3 Plot Duration VS Efficiency for comparison
         def plot_duration_vs_efficiency():
             # Create Streamlit picker widgets
             start_date = st.date_input("Select Starting Date",
@@ -496,8 +453,8 @@ with container:
                 # groupby date and calculate mean of sleep duration and efficiency
                 filtered_df = filtered_df.groupby("date").mean()[["minutesAsleep", "efficiency"]].reset_index()
 
-                ax1.bar(filtered_df["date"], filtered_df["minutesAsleep"], color="blue", alpha=0.5, label="Duration")
-                ax2.plot(filtered_df["date"], filtered_df["efficiency"], color="red", marker="o", label="Efficiency")
+                ax1.bar(filtered_df["date"], filtered_df["minutesAsleep"], color="purple", alpha=0.5, label="Duration")
+                ax2.plot(filtered_df["date"], filtered_df["efficiency"], color="orange", marker="o", label="Efficiency")
                 ax1.tick_params(axis='x', rotation=45, labelsize=6)
                 ax1.tick_params(axis='y', labelsize=6)
                 ax2.tick_params(axis='y', labelsize=6)
@@ -515,7 +472,7 @@ with container:
         plot_duration_vs_efficiency()
 
 
-        # 5 Plot minutes Asleep and Awake over Time
+        # 4 Plot minutes Asleep and Awake over Time
         def plot_sleep_line_chart():
             # Create Streamlit picker widgets
             start_date = st.date_input("Select Starting Date",
@@ -564,7 +521,7 @@ with container:
         plot_sleep_line_chart()
 
 
-        # 6 histogram of the distribution of sleep start times for each hour of the day for a specific date range
+        # 5 Histogram of the distribution of sleep start times for each hour of the day for a specific date range
         # Function to plot sleep start and end time histograms
         def plot_sleep_timing():
             # Create Streamlit picker widgets
