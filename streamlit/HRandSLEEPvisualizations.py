@@ -182,7 +182,7 @@ with container:
             else:
                 # create the plot
                 names = set(filtered_df["name"].values)
-                calorie_dict = dict()  # dict zone name: average duration in minutes
+                calorie_dict = dict()  # dict zone name: average calories burnt
                 for name in names:
                     # get a df for each zone
                     zone_df = filtered_df[filtered_df["name"] == name]
@@ -190,7 +190,7 @@ with container:
                 fig, ax = plt.subplots(figsize=(8, 5))
                 ax.bar(calorie_dict.keys(), calorie_dict.values())
                 ax.set_xlabel('Heart Rate Zone')
-                ax.set_ylabel('Calories Burnt')
+                ax.set_ylabel('Calories')
                 ax.set_title(f"Calories Burnt from {start_date} to {end_date} (Daily Average)")
                 st.pyplot(fig)
                 plt.close(fig)
@@ -315,7 +315,7 @@ with container:
                     X = np.array(X)
                     if len(X)==12:
                         X = X.reshape(1, 12 , 1)
-                        #Load the model
+                        #load the model
                         parent_dir = os.path.abspath(os.path.join(os.getcwd(), '..'))
                         folder_path = os.path.join(parent_dir, 'machine_learning')    
                         with open(folder_path+'/lstm_model.p', 'rb') as f:
@@ -324,7 +324,7 @@ with container:
                         pred = model.predict(X)
                         st.write(f"The average value for heart rate for the next hour is {pred[0][0]:.2f}")
                     else:
-                        st.write("Sorry, no predictions can be done  for this datetime.")
+                        st.write("Sorry, no predictions can be done for this datetime.")
 
         plot_hr_ts()
         hr_boxplot()
