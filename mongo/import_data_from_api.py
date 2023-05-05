@@ -1,4 +1,6 @@
-from api.fitbit_client import FitbitApiClient
+#from api.fitbit_client import FitbitApiClient
+from fitbit_client import FitbitApiClient
+
 from datetime import date, timedelta
 import hashlib
 import pymongo
@@ -168,8 +170,8 @@ client = FitbitMongoClient(
     fitbit_client_id= "23QRJ6",
     fitbit_client_secret= "abb49f0cdfcfd2605f02fcae11dda3b4",
 )
-startTime = date(year = 2023, month = 3, day = 27)
+startTime = date(year = 2023, month = 4, day = 20)
 endTime = date.today()
 client.import_sleep_data_for_daterange()
 client.import_heart_data_for_daterange()
-client.import_hrv_data_for_daterange()
+client.import_hrv_data_for_daterange(startTime)

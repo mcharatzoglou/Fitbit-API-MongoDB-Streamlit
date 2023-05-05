@@ -198,7 +198,6 @@ def rhr_boxplot():
     collection="fitbit",
     )
     filtered_df = client.dataframe_heart_resting_heart_rate(start_date, end_date)
-    print(filtered_df)
     # Check if selected_data is empty
     if filtered_df.empty:
         st.write("No data available for selected date range.")
