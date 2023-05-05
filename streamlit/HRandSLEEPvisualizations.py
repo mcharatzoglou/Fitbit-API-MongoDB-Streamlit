@@ -14,7 +14,7 @@ from export_dataframes import MongoClientDataframes
 container = st.container()
 
 # Create tabs using container
-tabs = ["Heart Rate", "Sleep"]
+tabs = ["Heart Rate & Heart Rate Variability", "Sleep"]
 with container:
     selected_tab = st.sidebar.radio("Select Tab", tabs)
 
@@ -22,7 +22,7 @@ with container:
 with container:
     container.markdown("<h1 style='color: red'>My Fitbit data</h1>", unsafe_allow_html=True)
 
-    if selected_tab == "Heart Rate":
+    if selected_tab == "Heart Rate & Heart Rate Variability":
 
         def plot_hr_ts():
             '''Plot 1: creates a plot of the heart rate time series for the user defined date range'''
@@ -35,7 +35,7 @@ with container:
                                     value=dt.datetime.strptime("2023-03-27", "%Y-%m-%d"),
                                     key="date1")
             end_date = st.date_input("Select Ending Date",
-                                    value=dt.datetime.strptime("2023-03-28", "%Y-%m-%d"),
+                                    value=dt.datetime.strptime("2023-04-28", "%Y-%m-%d"),
                                     key="date2")
 
             # get data from MongoDB as dataframe
@@ -79,7 +79,7 @@ with container:
                                     value=dt.datetime.strptime("2023-03-27", "%Y-%m-%d"),
                                     key="date3")
             end_date = st.date_input("Select Ending Date",
-                                    value=dt.datetime.strptime("2023-03-27", "%Y-%m-%d"),
+                                    value=dt.datetime.strptime("2023-04-28", "%Y-%m-%d"),
                                     key="date4")
 
             # get data from MongoDB as dataframe
@@ -112,10 +112,10 @@ with container:
 
             # Create Streamlit picker widgets
             start_date = st.date_input("Select Starting Date",
-                                    value=dt.datetime.strptime("2023-03-27", "%Y-%m-%d"),
+                                    value=dt.datetime.strptime("2023-04-18", "%Y-%m-%d"),
                                     key="date5")
             end_date = st.date_input("Select Ending Date",
-                                    value=dt.datetime.strptime("2023-03-27", "%Y-%m-%d"),
+                                    value=dt.datetime.strptime("2023-04-18", "%Y-%m-%d"),
                                     key="date6")
 
             # get data from MongoDB as dataframe
@@ -163,10 +163,10 @@ with container:
 
             # Create Streamlit picker widgets
             start_date = st.date_input("Select Starting Date",
-                                    value=dt.datetime.strptime("2023-03-27", "%Y-%m-%d"),
+                                    value=dt.datetime.strptime("2023-04-18", "%Y-%m-%d"),
                                     key="date7")
             end_date = st.date_input("Select Ending Date",
-                                    value=dt.datetime.strptime("2023-03-27", "%Y-%m-%d"),
+                                    value=dt.datetime.strptime("2023-04-18", "%Y-%m-%d"),
                                     key="date8")
 
             # get data from MongoDB as dataframe
@@ -204,10 +204,10 @@ with container:
 
             # Create Streamlit picker widgets
             start_date = st.date_input("Select Starting Date",
-                                    value=dt.datetime.strptime("2023-03-28", "%Y-%m-%d"),
+                                    value=dt.datetime.strptime("2023-03-27", "%Y-%m-%d"),
                                     key="date9")
             end_date = st.date_input("Select Ending Date",
-                                    value=dt.datetime.strptime("2023-03-29", "%Y-%m-%d"),
+                                    value=dt.datetime.strptime("2023-04-28", "%Y-%m-%d"),
                                     key="date10")
 
             # get data from MongoDB as dataframe
@@ -281,11 +281,11 @@ with container:
 
             # Create Streamlit picker widgets
             start_date = st.date_input("Select Date",
-                                    value=dt.datetime.strptime("2023-04-28", "%Y-%m-%d"),
+                                    value=dt.datetime.strptime("2023-04-02", "%Y-%m-%d"),
                                     key="date13")
             end_date = start_date
             end_time = st.time_input("Select Time",
-                                    value=dt.datetime.strptime("00:00:00", "%H:%M:%S"),
+                                    value=dt.datetime.strptime("01:00:00", "%H:%M:%S"),
                                     key="time1")
 
             # get data from MongoDB as dataframe
@@ -326,7 +326,6 @@ with container:
                     else:
                         st.write("Sorry, no predictions can be done  for this datetime.")
 
-        predict_next_hour()
         plot_hr_ts()
         hr_boxplot()
         hr_pie_chart()

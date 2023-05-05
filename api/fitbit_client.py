@@ -1,7 +1,7 @@
 import pandas as pd
 import fitbit
-import gather_keys_oauth2 as Oauth2
-#import api.gather_keys_oauth2 as Oauth2
+#import gather_keys_oauth2 as Oauth2
+import api.gather_keys_oauth2 as Oauth2
 from datetime import timedelta,datetime
 import requests
 

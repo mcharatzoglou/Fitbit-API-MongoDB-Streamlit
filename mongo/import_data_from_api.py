@@ -1,6 +1,4 @@
-#from api.fitbit_client import FitbitApiClient
-from fitbit_client import FitbitApiClient
-
+from api.fitbit_client import FitbitApiClient
 from datetime import date, timedelta
 import hashlib
 import pymongo
