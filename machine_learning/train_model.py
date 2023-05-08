@@ -7,10 +7,8 @@ from datetime import date, datetime
 import pickle
 import sys
 import os
-import tensorflow as tf
 
 np.random.seed(42)
-tf.random.set_seed(42)
 
 sys.path.append('../export_to_dataframes')
 from export_dataframes import MongoClientDataframes
