@@ -277,7 +277,8 @@ with container:
         def predict_next_hour():
             '''make predictions for the average heart rate of the next hour'''
 
-            st.markdown("<h3 style='color: green'>Heart Rate: Next Hour Prediction</h3>", unsafe_allow_html=True)
+            st.markdown("<h3 style='color: green'>Heart Rate: Next Hour\
+                         Prediction</h3>", unsafe_allow_html=True)
 
             # Create Streamlit picker widgets
             start_date = st.date_input("Select Date",
