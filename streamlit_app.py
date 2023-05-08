@@ -4,10 +4,8 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
 import datetime as dt
-import sys
 import os
 import pickle
-sys.path.append('../export_to_dataframes')
 from export_dataframes import MongoClientDataframes
 
 #create a container
@@ -317,7 +315,7 @@ with container:
                     if len(X)==12:
                         X = X.reshape(1, 12 , 1)
                         #load the model
-                        parent_dir = os.path.abspath(os.path.join(os.getcwd(), '..'))
+                        parent_dir = os.path.abspath(os.path.join(os.getcwd(), ''))
                         folder_path = os.path.join(parent_dir, 'machine_learning')    
                         with open(folder_path+'/lstm_model.p', 'rb') as f:
                             model = pickle.load(f)
