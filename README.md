@@ -1,4 +1,4 @@
-# Fitbit-API-MongoDB-Streamlit
+# Fitbit API - MongoDB - Streamlit
 This is a hands-on lab project on using Fitbit API for acquiring data from the web, storing them in a MongoDB database, and visualizing them using Streamlit.
 
 
