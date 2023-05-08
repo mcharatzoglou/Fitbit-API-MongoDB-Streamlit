@@ -38,8 +38,8 @@ with container:
 
             # get data from MongoDB as dataframe
             client = MongoClientDataframes(
-                connection_string="mongodb://localhost:27017/",
-                database="local",
+                connection_string="mongodb+srv://myteam:jeX1tmh72SyqsBp4@cluster0.7mepulo.mongodb.net/?retryWrites=true&w=majority",
+                database="fitbit",
                 collection="fitbit",
             )
             filtered_df = client.dataframe_heart_rate(start_date, end_date)
@@ -82,8 +82,8 @@ with container:
 
             # get data from MongoDB as dataframe
             client = MongoClientDataframes(
-                connection_string="mongodb://localhost:27017/",
-                database="local",
+                connection_string="mongodb+srv://myteam:jeX1tmh72SyqsBp4@cluster0.7mepulo.mongodb.net/?retryWrites=true&w=majority",
+                database="fitbit",
                 collection="fitbit",
             )
             filtered_df = client.dataframe_heart_rate(start_date, end_date)
@@ -118,8 +118,8 @@ with container:
 
             # get data from MongoDB as dataframe
             client = MongoClientDataframes(
-                connection_string="mongodb://localhost:27017/",
-                database="local",
+                connection_string="mongodb+srv://myteam:jeX1tmh72SyqsBp4@cluster0.7mepulo.mongodb.net/?retryWrites=true&w=majority",
+                database="fitbit",
                 collection="fitbit",
             )
             filtered_df = client.dataframe_heart_summary(start_date, end_date)
@@ -169,8 +169,8 @@ with container:
 
             # get data from MongoDB as dataframe
             client = MongoClientDataframes(
-                connection_string="mongodb://localhost:27017/",
-                database="local",
+                connection_string="mongodb+srv://myteam:jeX1tmh72SyqsBp4@cluster0.7mepulo.mongodb.net/?retryWrites=true&w=majority",
+                database="fitbit",
                 collection="fitbit",
             )
             filtered_df = client.dataframe_heart_summary(start_date, end_date)
@@ -210,8 +210,8 @@ with container:
 
             # get data from MongoDB as dataframe
             client = MongoClientDataframes(
-                connection_string="mongodb://localhost:27017/",
-                database="local",
+                connection_string="mongodb+srv://myteam:jeX1tmh72SyqsBp4@cluster0.7mepulo.mongodb.net/?retryWrites=true&w=majority",
+                database="fitbit",
                 collection="fitbit",
             )
             filtered_df = client.dataframe_heart_resting_heart_rate(start_date, end_date)
@@ -245,8 +245,8 @@ with container:
 
             # get data from MongoDB as dataframe
             client = MongoClientDataframes(
-                connection_string="mongodb://localhost:27017/",
-                database="local",
+                connection_string="mongodb+srv://myteam:jeX1tmh72SyqsBp4@cluster0.7mepulo.mongodb.net/?retryWrites=true&w=majority",
+                database="fitbit",
                 collection="fitbit",
             )
             filtered_df = client.dataframe_hrv(start_date, end_date)
@@ -289,8 +289,8 @@ with container:
 
             # get data from MongoDB as dataframe
             client = MongoClientDataframes(
-                connection_string="mongodb://localhost:27017/",
-                database="local",
+                connection_string="mongodb+srv://myteam:jeX1tmh72SyqsBp4@cluster0.7mepulo.mongodb.net/?retryWrites=true&w=majority",
+                database="fitbit",
                 collection="fitbit",
             )
             df = client.dataframe_heart_rate(start_date, end_date)
@@ -315,9 +315,7 @@ with container:
                     if len(X)==12:
                         X = X.reshape(1, 12 , 1)
                         #load the model
-                        parent_dir = os.path.abspath(os.path.join(os.getcwd(), ''))
-                        folder_path = os.path.join(parent_dir, 'machine_learning')    
-                        with open(folder_path+'/lstm_model.p', 'rb') as f:
+                        with open('lstm_model.p', 'rb') as f:
                             model = pickle.load(f)
                         #make prediction
                         pred = model.predict(X)
@@ -348,8 +346,8 @@ with container:
 
             # get data from MongoDB as dataframe
             client = MongoClientDataframes(
-                connection_string="mongodb://localhost:27017/",
-                database="local",
+                connection_string="mongodb+srv://myteam:jeX1tmh72SyqsBp4@cluster0.7mepulo.mongodb.net/?retryWrites=true&w=majority",
+                database="fitbit",
                 collection="fitbit",
             )
             filtered_df = client.dataframe_sleep_metrics(start_date, end_date)
@@ -407,8 +405,8 @@ with container:
 
         # create a MongoDB client to connect to the database
         client = MongoClientDataframes(
-            connection_string="mongodb://localhost:27017/",
-            database="local",
+            connection_string="mongodb+srv://myteam:jeX1tmh72SyqsBp4@cluster0.7mepulo.mongodb.net/?retryWrites=true&w=majority",
+            database="fitbit",
             collection="fitbit",
         )
 
@@ -431,8 +429,8 @@ with container:
 
             # get data from MongoDB as dataframe
             client = MongoClientDataframes(
-                connection_string="mongodb://localhost:27017/",
-                database="local",
+                connection_string="mongodb+srv://myteam:jeX1tmh72SyqsBp4@cluster0.7mepulo.mongodb.net/?retryWrites=true&w=majority",
+                database="fitbit",
                 collection="fitbit",
             )
             filtered_df = client.dataframe_sleep_metrics(start_date, end_date)
@@ -483,8 +481,8 @@ with container:
 
             # Get data from MongoDB as dataframe
             client = MongoClientDataframes(
-                connection_string="mongodb://localhost:27017/",
-                database="local",
+                connection_string="mongodb+srv://myteam:jeX1tmh72SyqsBp4@cluster0.7mepulo.mongodb.net/?retryWrites=true&w=majority",
+                database="fitbit",
                 collection="fitbit",
             )
             filtered_df = client.dataframe_sleep_metrics(start_date, end_date)
@@ -533,8 +531,8 @@ with container:
 
             # get data from MongoDB as dataframe
             client = MongoClientDataframes(
-                connection_string="mongodb://localhost:27017/",
-                database="local",
+                connection_string="mongodb+srv://myteam:jeX1tmh72SyqsBp4@cluster0.7mepulo.mongodb.net/?retryWrites=true&w=majority",
+                database="fitbit",
                 collection="fitbit",
             )
             filtered_df = client.dataframe_sleep_metrics(start_date, end_date)

@@ -81,7 +81,7 @@ def train_model():
     # Save the model to a pickle file
     parent_dir = os.path.abspath(os.path.join(os.getcwd(), '..'))
     folder_path = os.path.join(parent_dir, 'machine_learning')    
-    with open(folder_path+'/lstm_model.p', 'wb') as f:
+    with open(parent_dir+'/lstm_model.p', 'wb') as f:
         pickle.dump(model, f)
 
     #make predictions

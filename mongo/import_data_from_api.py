@@ -2,6 +2,8 @@ from api.fitbit_client import FitbitApiClient
 from datetime import date, timedelta
 import hashlib
 import pymongo
+from pymongo.server_api import ServerApi
+
 
 
 class FitbitMongoClient:
@@ -22,7 +24,7 @@ class FitbitMongoClient:
         """
         try:
             # Connect to MongoDB
-            self.mongo_client = pymongo.MongoClient(connection_string)
+            self.mongo_client = pymongo.MongoClient(connection_string,server_api=ServerApi('1'))
             self.db = self.mongo_client[database]
             self.collection = self.db[collection]
 
@@ -162,8 +164,8 @@ class FitbitMongoClient:
 
 # EXAMPLE CODE
 client = FitbitMongoClient(
-    connection_string = "mongodb://localhost:27017/",
-    database="local",
+    connection_string = "mongodb+srv://myteam:jeX1tmh72SyqsBp4@cluster0.7mepulo.mongodb.net/?retryWrites=true&w=majority",
+    database="fitbit",
     collection="fitbit",
     fitbit_client_id= "23QRJ6",
     fitbit_client_secret= "abb49f0cdfcfd2605f02fcae11dda3b4",
