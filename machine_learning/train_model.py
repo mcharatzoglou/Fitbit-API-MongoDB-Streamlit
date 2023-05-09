@@ -20,9 +20,10 @@ def get__hr_data():
 
     #get heart rate data from MongoDB
     client = MongoClientDataframes(
-        connection_string = "mongodb://localhost:27017/",
-        database="local",
-        collection="fitbit")
+        connection_string="MONGO_URL_GOES_HERE",
+        database="DATABASE_HERE",
+        collection="COLLECTION_HERE",
+    )
     startTime = date(year = 2023, month =3, day = 28)
     endTime =  date(year = 2023, month = 4, day = 29)
     df = client.dataframe_heart_rate(start_date=startTime)

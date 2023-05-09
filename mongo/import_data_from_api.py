@@ -164,11 +164,11 @@ class FitbitMongoClient:
 
 # EXAMPLE CODE
 client = FitbitMongoClient(
-    connection_string = "mongodb+srv://myteam:jeX1tmh72SyqsBp4@cluster0.7mepulo.mongodb.net/?retryWrites=true&w=majority",
-    database="fitbit",
-    collection="fitbit",
-    fitbit_client_id= "23QRJ6",
-    fitbit_client_secret= "abb49f0cdfcfd2605f02fcae11dda3b4",
+    connection_string="MONGO_URL_GOES_HERE",
+    database="DATABASE_HERE",
+    collection="COLLECTION_HERE",
+    fitbit_client_id="FITBIT_CLIENT_ID_HERE",
+    fitbit_client_secret="FITBIT_CLIENT_SECRET_HERE",
 )
 startTime = date(year = 2023, month = 4, day = 20)
 endTime = date.today()

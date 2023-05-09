@@ -38,9 +38,9 @@ with container:
 
             # get data from MongoDB as dataframe
             client = MongoClientDataframes(
-                connection_string="mongodb+srv://myteam:jeX1tmh72SyqsBp4@cluster0.7mepulo.mongodb.net/?retryWrites=true&w=majority",
-                database="fitbit",
-                collection="fitbit",
+                connection_string="MONGO_URL_GOES_HERE",
+                database="DATABASE_HERE",
+                collection="COLLECTION_HERE",
             )
             filtered_df = client.dataframe_heart_rate(start_date, end_date)
             # Check if df is empty
@@ -82,9 +82,9 @@ with container:
 
             # get data from MongoDB as dataframe
             client = MongoClientDataframes(
-                connection_string="mongodb+srv://myteam:jeX1tmh72SyqsBp4@cluster0.7mepulo.mongodb.net/?retryWrites=true&w=majority",
-                database="fitbit",
-                collection="fitbit",
+                connection_string="MONGO_URL_GOES_HERE",
+                database="DATABASE_HERE",
+                collection="COLLECTION_HERE",
             )
             filtered_df = client.dataframe_heart_rate(start_date, end_date)
 
@@ -118,9 +118,9 @@ with container:
 
             # get data from MongoDB as dataframe
             client = MongoClientDataframes(
-                connection_string="mongodb+srv://myteam:jeX1tmh72SyqsBp4@cluster0.7mepulo.mongodb.net/?retryWrites=true&w=majority",
-                database="fitbit",
-                collection="fitbit",
+                connection_string="MONGO_URL_GOES_HERE",
+                database="DATABASE_HERE",
+                collection="COLLECTION_HERE",
             )
             filtered_df = client.dataframe_heart_summary(start_date, end_date)
 
@@ -169,9 +169,9 @@ with container:
 
             # get data from MongoDB as dataframe
             client = MongoClientDataframes(
-                connection_string="mongodb+srv://myteam:jeX1tmh72SyqsBp4@cluster0.7mepulo.mongodb.net/?retryWrites=true&w=majority",
-                database="fitbit",
-                collection="fitbit",
+                connection_string="MONGO_URL_GOES_HERE",
+                database="DATABASE_HERE",
+                collection="COLLECTION_HERE",
             )
             filtered_df = client.dataframe_heart_summary(start_date, end_date)
 
@@ -210,9 +210,9 @@ with container:
 
             # get data from MongoDB as dataframe
             client = MongoClientDataframes(
-                connection_string="mongodb+srv://myteam:jeX1tmh72SyqsBp4@cluster0.7mepulo.mongodb.net/?retryWrites=true&w=majority",
-                database="fitbit",
-                collection="fitbit",
+                connection_string="MONGO_URL_GOES_HERE",
+                database="DATABASE_HERE",
+                collection="COLLECTION_HERE",
             )
             filtered_df = client.dataframe_heart_resting_heart_rate(start_date, end_date)
             # Check if selected_data is empty
@@ -245,9 +245,9 @@ with container:
 
             # get data from MongoDB as dataframe
             client = MongoClientDataframes(
-                connection_string="mongodb+srv://myteam:jeX1tmh72SyqsBp4@cluster0.7mepulo.mongodb.net/?retryWrites=true&w=majority",
-                database="fitbit",
-                collection="fitbit",
+                connection_string="MONGO_URL_GOES_HERE",
+                database="DATABASE_HERE",
+                collection="COLLECTION_HERE",
             )
             filtered_df = client.dataframe_hrv(start_date, end_date)
             # Check if df is empty
@@ -289,9 +289,9 @@ with container:
 
             # get data from MongoDB as dataframe
             client = MongoClientDataframes(
-                connection_string="mongodb+srv://myteam:jeX1tmh72SyqsBp4@cluster0.7mepulo.mongodb.net/?retryWrites=true&w=majority",
-                database="fitbit",
-                collection="fitbit",
+                connection_string="MONGO_URL_GOES_HERE",
+                database="DATABASE_HERE",
+                collection="COLLECTION_HERE",
             )
             df = client.dataframe_heart_rate(start_date, end_date)
             
@@ -346,9 +346,9 @@ with container:
 
             # get data from MongoDB as dataframe
             client = MongoClientDataframes(
-                connection_string="mongodb+srv://myteam:jeX1tmh72SyqsBp4@cluster0.7mepulo.mongodb.net/?retryWrites=true&w=majority",
-                database="fitbit",
-                collection="fitbit",
+                connection_string="MONGO_URL_GOES_HERE",
+                database="DATABASE_HERE",
+                collection="COLLECTION_HERE",
             )
             filtered_df = client.dataframe_sleep_metrics(start_date, end_date)
             if filtered_df.empty:
@@ -405,9 +405,9 @@ with container:
 
         # create a MongoDB client to connect to the database
         client = MongoClientDataframes(
-            connection_string="mongodb+srv://myteam:jeX1tmh72SyqsBp4@cluster0.7mepulo.mongodb.net/?retryWrites=true&w=majority",
-            database="fitbit",
-            collection="fitbit",
+            connection_string="MONGO_URL_GOES_HERE",
+            database="DATABASE_HERE",
+            collection="COLLECTION_HERE",
         )
 
         # retrieve the sleep summary data for the selected date
@@ -421,23 +421,30 @@ with container:
         def plot_duration_vs_efficiency():
             # Create Streamlit picker widgets
             start_date = st.date_input("Select Starting Date",
-                                    value=dt.datetime.strptime("2023-03-27", "%Y-%m-%d"),
-                                    key="date7")
+                                       value=dt.datetime.strptime("2023-03-27", "%Y-%m-%d"),
+                                       key="date7")
             end_date = st.date_input("Select Ending Date",
-                                    value=dt.datetime.strptime("2023-04-28", "%Y-%m-%d"),
-                                    key="date8")
+                                     value=dt.datetime.strptime("2023-04-28", "%Y-%m-%d"),
+                                     key="date8")
 
             # get data from MongoDB as dataframe
             client = MongoClientDataframes(
-                connection_string="mongodb+srv://myteam:jeX1tmh72SyqsBp4@cluster0.7mepulo.mongodb.net/?retryWrites=true&w=majority",
-                database="fitbit",
-                collection="fitbit",
+                connection_string="MONGO_URL_GOES_HERE",
+                database="DATABASE_HERE",
+                collection="COLLECTION_HERE",
             )
             filtered_df = client.dataframe_sleep_metrics(start_date, end_date)
 
             if filtered_df.empty:
                 st.write("No data available for selected date.")
             else:
+                # Convert columns to numeric
+                filtered_df["minutesAsleep"] = pd.to_numeric(filtered_df["minutesAsleep"])
+                filtered_df["efficiency"] = pd.to_numeric(filtered_df["efficiency"])
+
+                # Convert "date" column to datetime
+                filtered_df["date"] = pd.to_datetime(filtered_df["date"])
+
                 # Create the bar plot
                 fig, ax1 = plt.subplots(figsize=(10, 6))
                 ax2 = ax1.twinx()
@@ -447,8 +454,8 @@ with container:
                 ax2.set_ylabel('Sleep Efficiency (%)')
                 ax1.set_title('Sleep Duration and Efficiency over Time')
 
-                # groupby date and calculate mean of sleep duration and efficiency
-                filtered_df = filtered_df.groupby("date").mean()[["minutesAsleep", "efficiency"]].reset_index()
+                # Groupby date and calculate mean of sleep duration and efficiency
+                filtered_df = filtered_df.groupby("date").mean().reset_index()
 
                 ax1.bar(filtered_df["date"], filtered_df["minutesAsleep"], color="purple", alpha=0.5, label="Duration")
                 ax2.plot(filtered_df["date"], filtered_df["efficiency"], color="orange", marker="o", label="Efficiency")
@@ -462,8 +469,8 @@ with container:
                 plt.close(fig)
 
 
-        #st.title("Sleep Duration and Efficiency Over Time")
-        st.markdown("<h3 style='color: magenta'>Sleep Duration and Efficiency Over Time</h3>", 
+        # st.title("Sleep Duration and Efficiency Over Time")
+        st.markdown("<h3 style='color: magenta'>Sleep Duration and Efficiency Over Time</h3>",
                     unsafe_allow_html=True)
         # Generate the bar plot
         plot_duration_vs_efficiency()
@@ -481,9 +488,9 @@ with container:
 
             # Get data from MongoDB as dataframe
             client = MongoClientDataframes(
-                connection_string="mongodb+srv://myteam:jeX1tmh72SyqsBp4@cluster0.7mepulo.mongodb.net/?retryWrites=true&w=majority",
-                database="fitbit",
-                collection="fitbit",
+                connection_string="MONGO_URL_GOES_HERE",
+                database="DATABASE_HERE",
+                collection="COLLECTION_HERE",
             )
             filtered_df = client.dataframe_sleep_metrics(start_date, end_date)
 
@@ -531,9 +538,9 @@ with container:
 
             # get data from MongoDB as dataframe
             client = MongoClientDataframes(
-                connection_string="mongodb+srv://myteam:jeX1tmh72SyqsBp4@cluster0.7mepulo.mongodb.net/?retryWrites=true&w=majority",
-                database="fitbit",
-                collection="fitbit",
+                connection_string="MONGO_URL_GOES_HERE",
+                database="DATABASE_HERE",
+                collection="COLLECTION_HERE",
             )
             filtered_df = client.dataframe_sleep_metrics(start_date, end_date)
 
